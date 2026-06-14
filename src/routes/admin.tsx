@@ -228,7 +228,7 @@ function DashboardSection() {
                     <td className="px-5 py-3.5 text-muted-foreground">{o.userEmail ?? "—"}</td>
                     <td className="px-5 py-3.5 text-muted-foreground">{o.orderDate ? new Date(o.orderDate).toLocaleDateString() : "—"}</td>
                     <td className="px-5 py-3.5"><StatusBadge status={o.status} /></td>
-                    <td className="px-5 py-3.5 text-right font-display">${o.totalAmount.toFixed(2)}</td>
+                    <td className="px-5 py-3.5 text-right font-display">₮{o.totalAmount.toLocaleString("mn-MN")}</td>
                   </tr>
                 ))}
             </tbody>
@@ -280,7 +280,7 @@ function OrdersSection() {
                 <td className="px-5 py-3.5 text-muted-foreground">{o.orderDate ? new Date(o.orderDate).toLocaleDateString() : "—"}</td>
                 <td className="px-5 py-3.5 text-muted-foreground capitalize">{o.paymentMethod ?? "card"}</td>
                 <td className="px-5 py-3.5"><StatusBadge status={o.status} /></td>
-                <td className="px-5 py-3.5 text-right font-display">${o.totalAmount.toFixed(2)}</td>
+                <td className="px-5 py-3.5 text-right font-display">₮{o.totalAmount.toLocaleString("mn-MN")}</td>
                 <td className="px-5 py-3.5">
                   <select
                     value={o.status}
@@ -338,7 +338,7 @@ function CustomersSection() {
                 <td className="px-5 py-3.5 text-muted-foreground">{c.email}</td>
                 <td className="px-5 py-3.5 text-muted-foreground">{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
                 <td className="px-5 py-3.5">{c.orderCount ?? 0}</td>
-                <td className="px-5 py-3.5 text-right font-display">${Number(c.totalSpent ?? 0).toFixed(2)}</td>
+                <td className="px-5 py-3.5 text-right font-display">₮{Number(c.totalSpent ?? 0).toLocaleString("mn-MN")}</td>
                 <td className="px-5 py-3.5">
                   <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${c.isAdmin ? "bg-brand/10 text-brand" : "bg-muted text-muted-foreground"}`}>
                     {c.isAdmin ? t("common.admin") : t("common.customers")}
@@ -810,8 +810,8 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
                 </td>
                 <td className="px-5 py-3.5 text-muted-foreground">{p.category ?? "—"}</td>
                 <td className="px-5 py-3.5">
-                  <span className="font-display">${p.price}</span>
-                  {p.oldPrice && <span className="ml-1.5 text-xs text-muted-foreground line-through">${p.oldPrice}</span>}
+                  <span className="font-display">₮{Number(p.price).toLocaleString("mn-MN")}</span>
+                  {p.oldPrice && <span className="ml-1.5 text-xs text-muted-foreground line-through">₮{Number(p.oldPrice).toLocaleString("mn-MN")}</span>}
                 </td>
                 <td className="px-5 py-3.5">
                   <span className={`font-medium ${p.stock === 0 ? "text-red-500" : p.stock < 10 ? "text-amber-500" : "text-emerald-600"}`}>

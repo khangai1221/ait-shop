@@ -61,15 +61,15 @@ export function Filters({
       <FilterSection title={t("common.price")}>
         <input
           type="range"
-          min={89000}
-          max={300000}
+          min={200000}
+          max={700000}
           step={10000}
           value={value.maxPrice}
           onChange={(e) => onChange({ ...value, maxPrice: Number(e.target.value) })}
           className="w-full accent-[color:var(--brand)]"
         />
         <div className="flex justify-between text-xs text-muted-foreground mt-2">
-          <span>{formatPrice(89000)}</span>
+          <span>{formatPrice(200000)}</span>
           <span className="font-semibold text-ink">{t("common.upTo")} {formatPrice(value.maxPrice)}</span>
         </div>
       </FilterSection>
@@ -141,4 +141,4 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-export const emptyFilters: FilterState = { sizes: [], colors: [], category: null, maxPrice: 300000 };
+export const emptyFilters: FilterState = { sizes: [], colors: [], category: null, maxPrice: 700000 };

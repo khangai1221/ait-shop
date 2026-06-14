@@ -127,6 +127,7 @@ function Checkout() {
   const total = cartTotal + shipping;
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (cart.length === 0) {
       toast.error(t("checkout.emptyCart"));
       return;
