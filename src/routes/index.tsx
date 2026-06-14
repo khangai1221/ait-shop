@@ -33,7 +33,7 @@ function Home() {
   const [heroProduct, setHeroProduct] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
 
-  const { data: dbProducts = [] } = useQuery({
+  const { data: dbProducts = [], isPending } = useQuery({
     queryKey: ["products"],
     queryFn: () => getProducts(),
   });
@@ -58,7 +58,7 @@ function Home() {
     return counts;
   }, [dbProducts]);
 
-  if (!heroProduct) {
+  if (isPending || !heroProduct) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="h-8 w-8 rounded-full border-2 border-brand border-t-transparent animate-spin" />

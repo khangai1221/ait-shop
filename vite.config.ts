@@ -14,8 +14,5 @@ export default defineConfig({
   },
   nitro: {
     preset: "vercel",
-    externals: {
-      external: ["better-sqlite3"],
-    },
   },
 });

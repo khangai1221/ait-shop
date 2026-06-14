@@ -69,7 +69,7 @@ const SEED_PRODUCTS = [
 async function ensureSeeded() {
   // Add image_urls column to existing databases that predate this feature
   try {
-    db.run(sql`ALTER TABLE products ADD COLUMN image_urls TEXT`);
+    await db.run(sql`ALTER TABLE products ADD COLUMN image_urls TEXT`);
   } catch {
     // Column already exists — ignore
   }
@@ -98,8 +98,28 @@ async function ensureSeeded() {
 }
 
 export const getProducts = createServerFn({ method: "GET" }).handler(async () => {
-  await ensureSeeded();
-  return db.select().from(products).orderBy(desc(products.createdAt));
+  try {
+    await ensureSeeded();
+    return db.select().from(products).orderBy(desc(products.createdAt));
+  } catch (err) {
+    console.error("DB unavailable, returning seed data:", err);
+    return SEED_PRODUCTS.map((p, idx) => ({
+      id: idx + 1,
+      name: p.name,
+      price: p.price,
+      oldPrice: p.oldPrice ?? null,
+      stock: p.stock,
+      description: p.description ?? null,
+      imageUrl: p.imageUrl ?? null,
+      imageUrls: null,
+      category: p.category ?? null,
+      badge: p.badge ?? null,
+      colors: p.colors ?? null,
+      sizes: p.sizes ?? null,
+      rating: p.rating ?? null,
+      createdAt: new Date(),
+    }));
+  }
 });
 
 export const getProductById = createServerFn({ method: "POST" })

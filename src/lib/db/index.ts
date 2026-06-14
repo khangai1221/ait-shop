@@ -1,9 +1,12 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 import * as schema from "./schema";
 
-const dbPath = process.env.NODE_ENV === "production" ? "/tmp/stride_showcase.db" : "./stride_showcase.db";
+const url =
+  process.env.NODE_ENV === "production"
+    ? "file:/tmp/stride_showcase.db"
+    : "file:./stride_showcase.db";
 
-const sqlite = new Database(dbPath);
+const client = createClient({ url });
 
-export const db = drizzle(sqlite, { schema });
+export const db = drizzle(client, { schema });
