@@ -1,8 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { db } from "../db";
+import { db, ensureReady } from "../db";
 import { products } from "../db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { requireAdmin, sanitize } from "../server-auth";
 
 const SUPABASE_URL = "https://soeoluptfhyaopjuqbjr.supabase.co";
@@ -67,32 +67,23 @@ const SEED_PRODUCTS = [
 ];
 
 async function ensureSeeded() {
-  // Add image_urls column to existing databases that predate this feature
-  try {
-    await db.run(sql`ALTER TABLE products ADD COLUMN image_urls TEXT`);
-  } catch {
-    // Column already exists — ignore
-  }
-
-  const existing = await db
-    .select({ id: products.id, price: products.price })
-    .from(products)
-    .limit(1);
+  await ensureReady();
+  const existing = await db.select({ id: products.id }).from(products).limit(1);
   if (existing.length === 0) {
-    await db.insert(products).values(SEED_PRODUCTS);
-  } else if (existing[0].price < 10000) {
-    // Prices still stored as USD — migrate all to MNT (×3400)
-    const all = await db.select().from(products);
-    await Promise.all(
-      all.map((p) =>
-        db
-          .update(products)
-          .set({
-            price: Math.round(p.price * 3400),
-            oldPrice: p.oldPrice ? Math.round(p.oldPrice * 3400) : null,
-          })
-          .where(eq(products.id, p.id)),
-      ),
+    await db.insert(products).values(
+      SEED_PRODUCTS.map((p) => ({
+        name: p.name,
+        price: p.price,
+        oldPrice: "oldPrice" in p ? (p.oldPrice ?? null) : null,
+        stock: p.stock,
+        description: p.description ?? null,
+        imageUrl: p.imageUrl ?? null,
+        category: p.category ?? null,
+        badge: p.badge ?? null,
+        colors: p.colors ?? null,
+        sizes: p.sizes ?? null,
+        rating: p.rating ?? null,
+      })),
     );
   }
 }
@@ -125,6 +116,7 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
 export const getProductById = createServerFn({ method: "POST" })
   .inputValidator(z.object({ id: z.number() }))
   .handler(async ({ data }) => {
+    await ensureReady();
     const [product] = await db.select().from(products).where(eq(products.id, data.id));
     return product ?? null;
   });

@@ -1,12 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { db } from "../db";
+import { db, ensureReady } from "../db";
 import { users, orders } from "../db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { requireAdmin, sanitize } from "../server-auth";
 
 export const getAllUsers = createServerFn({ method: "GET" }).handler(async () => {
   await requireAdmin();
+  await ensureReady();
   const rows = await db
     .select({
       id: users.id,
@@ -31,6 +32,7 @@ export const getOrCreateUser = createServerFn({ method: "POST" })
     })
   )
   .handler(async ({ data }) => {
+    await ensureReady();
     let [user] = await db.select().from(users).where(eq(users.email, data.email));
     if (!user) {
       [user] = await db
@@ -61,6 +63,7 @@ export const updateUserProfile = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
+    await ensureReady();
     const { email, ...rest } = data;
     const updateData = {
       ...rest,

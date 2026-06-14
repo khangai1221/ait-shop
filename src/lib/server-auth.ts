@@ -1,6 +1,6 @@
 import { getCookie, getRequestHeader, getRequestIP } from "@tanstack/react-start/server";
 import { createClerkClient, verifyToken } from "@clerk/backend";
-import { db } from "@/lib/db";
+import { db, ensureReady } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
@@ -89,6 +89,8 @@ export async function requireAdmin(): Promise<{ userId: string }> {
   checkRateLimit(`admin:${clientIP()}`, 60, 60_000);
 
   const userId = await getVerifiedUserId();
+
+  await ensureReady();
 
   // Fast path: check DB via Clerk user ID
   const [dbUser] = await db

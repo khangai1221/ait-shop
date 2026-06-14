@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { db } from "../db";
+import { db, ensureReady } from "../db";
 import { orders, orderItems, users } from "../db/schema";
 import { eq, desc } from "drizzle-orm";
 import { requireAdmin, checkRateLimit, sanitize } from "../server-auth";
@@ -8,6 +8,7 @@ import { getCookie } from "@tanstack/react-start/server";
 
 export const getAllOrders = createServerFn({ method: "GET" }).handler(async () => {
   await requireAdmin();
+  await ensureReady();
   const rows = await db
     .select({
       id: orders.id,
@@ -29,6 +30,7 @@ export const getAllOrders = createServerFn({ method: "GET" }).handler(async () =
 export const getOrdersByEmail = createServerFn({ method: "POST" })
   .inputValidator(z.object({ email: z.string().email() }))
   .handler(async ({ data }) => {
+    await ensureReady();
     const [user] = await db.select().from(users).where(eq(users.email, data.email));
     if (!user) return [];
     const userOrders = await db
@@ -70,6 +72,8 @@ export const createOrder = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
+    await ensureReady();
+
     // 5 orders per minute per session to prevent spam
     const sessionCookie = getCookie("__session") ?? getCookie("__client_uat") ?? "anon";
     checkRateLimit(`order:${sessionCookie.slice(-16)}`, 5, 60_000);
@@ -120,6 +124,7 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
   )
   .handler(async ({ data }) => {
     await requireAdmin();
+    await ensureReady();
     const [order] = await db
       .update(orders)
       .set({ status: data.status })
