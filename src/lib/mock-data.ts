@@ -67,7 +67,7 @@ export const products: Product[] = NAMES.map((name, i) => ({
   images: [IMAGES[i % IMAGES.length]],
   rating: 3.5 + ((i * 7) % 15) / 10,
   badge: i % 5 === 0 ? "New" : i % 7 === 0 ? "-30%" : undefined,
-  stock: i % 9 === 0 ? 0 : 10 + (i * 3),
+  stock: i % 9 === 0 ? 0 : 10 + i * 3,
 }));
 
 export const categories = [

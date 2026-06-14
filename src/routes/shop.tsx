@@ -26,7 +26,7 @@ function activeFilterCount(f: FilterState): number {
   if (f.category) count++;
   if (f.sizes.length) count++;
   if (f.colors.length) count++;
-  if (f.maxPrice < 400000) count++;
+  if (f.maxPrice < 300000) count++;
   return count;
 }
 

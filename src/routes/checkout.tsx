@@ -100,7 +100,7 @@ function FakeQRCode({ total }: { total: number }) {
         <div className="text-center sm:text-left">
           <p className="text-xs text-muted-foreground">{t("checkout.scanQpay")}</p>
           <p className="font-display text-2xl mt-1 text-[#0057b7]">
-            ₮{totalMnt.toLocaleString("en-US")}
+            ₮{totalMnt.toLocaleString("mn-MN")}
           </p>
           <p className="text-xs text-muted-foreground mt-1">AirStep Mongolia</p>
         </div>
@@ -127,7 +127,6 @@ function Checkout() {
   const total = cartTotal + shipping;
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     if (cart.length === 0) {
       toast.error(t("checkout.emptyCart"));
       return;
@@ -325,14 +324,14 @@ function Checkout() {
                       Icon: Truck,
                       label: t("checkout.standard"),
                       sub: t("checkout.days35"),
-                      price: cartTotal > 100 ? t("common.free") : formatPrice(12, language),
+                      price: cartTotal > 340000 ? t("common.free") : formatPrice(40800, language),
                     },
                     {
                       id: "express",
                       Icon: Truck,
                       label: t("checkout.express"),
                       sub: t("checkout.days12"),
-                      price: formatPrice(18, language),
+                      price: formatPrice(61200, language),
                     },
                   ].map(({ id, Icon, label, sub, price }) => (
                     <label

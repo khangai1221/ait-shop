@@ -167,7 +167,7 @@ function DashboardSection() {
           { label: t("common.products"), value: String(stats?.totalProducts ?? "..."), color: "bg-teal-500" },
           { label: "In Stock", value: String(stats?.inStock ?? "..."), color: "bg-emerald-500" },
           { label: "Out of Stock", value: String(stats?.outOfStock ?? "..."), color: "bg-orange-500" },
-          { label: "Revenue", value: `$${totalRevenue.toFixed(0)}`, color: "bg-sky-500" },
+          { label: "Revenue", value: `₮${totalRevenue.toLocaleString("mn-MN")}`, color: "bg-sky-500" },
         ].map((it) => (
           <div key={it.label} className="bg-card rounded-2xl border border-border p-4">
             <p className="text-xs text-muted-foreground">{it.label}</p>
@@ -179,7 +179,7 @@ function DashboardSection() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: "Total Revenue", value: `$${totalRevenue.toFixed(0)}`, sub: "All time", up: true },
+            { label: "Total Revenue", value: `₮${totalRevenue.toLocaleString("mn-MN")}`, sub: "All time", up: true },
             { label: t("common.orders"), value: String(orders.length), sub: "All time", up: true },
             { label: "Pending / Cancelled", value: `${pendingCount} / ${cancelledCount}`, sub: "Need attention", up: false },
           ].map((card) => (
