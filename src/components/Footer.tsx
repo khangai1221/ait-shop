@@ -35,48 +35,56 @@ export function Footer() {
         <FooterSection title={t("common.stores")}>
           <ul className="space-y-2.5 text-sm text-white/70 pb-2">
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/find-store" className="hover:text-white transition">
                 {t("common.findStore")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/newsletter" className="hover:text-white transition">
                 {t("common.newsletter")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link
+                to="/login"
+                search={{ mode: "register" }}
+                className="hover:text-white transition"
+              >
                 {t("common.becomeMember")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/feedback" className="hover:text-white transition">
                 {t("common.siteFeedback")}
-              </a>
+              </Link>
             </li>
           </ul>
         </FooterSection>
         <FooterSection title={t("common.help")}>
           <ul className="space-y-2.5 text-sm text-white/70 pb-2">
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link
+                to="/profile"
+                search={{ tab: "orders" }}
+                className="hover:text-white transition"
+              >
                 {t("common.orderStatus")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/shipping" className="hover:text-white transition">
                 {t("common.shippingDelivery")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/returns" className="hover:text-white transition">
                 {t("common.returns")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/payment-options" className="hover:text-white transition">
                 {t("common.paymentOptions")}
-              </a>
+              </Link>
             </li>
             <li>
               <Link to="/contact" className="hover:text-white transition">
@@ -88,24 +96,24 @@ export function Footer() {
         <FooterSection title={t("common.aboutAirStep")}>
           <ul className="space-y-2.5 text-sm text-white/70 pb-2">
             <li>
-              <Link to="/about" className="hover:text-white transition">
+              <Link to="/news" className="hover:text-white transition">
                 {t("common.news")}
               </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/careers" className="hover:text-white transition">
                 {t("common.careers")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/investors" className="hover:text-white transition">
                 {t("common.investors")}
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="hover:text-white transition">
+              <Link to="/sustainability" className="hover:text-white transition">
                 {t("common.sustainability")}
-              </a>
+              </Link>
             </li>
           </ul>
         </FooterSection>

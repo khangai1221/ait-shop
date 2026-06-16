@@ -3,10 +3,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@clerk/clerk-react";
 import { Package, MapPin, Settings, User, ShoppingBag } from "lucide-react";
+import { z } from "zod";
 import { getOrdersByEmail } from "@/lib/api/orders";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/profile")({
+  validateSearch: z.object({
+    tab: z.enum(["profile", "orders", "addresses", "settings"]).optional(),
+  }),
   head: () => ({ meta: [{ title: "My account — AirStep" }] }),
   component: Profile,
 });
@@ -31,7 +35,8 @@ function Profile() {
     { id: "settings", label: t("profile.settings"), Icon: Settings },
   ] as const;
 
-  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("profile");
+  const { tab: initialTab } = Route.useSearch();
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>(initialTab ?? "profile");
   const email = user?.primaryEmailAddress?.emailAddress ?? "";
 
   const { data: orders = [], isLoading: ordersLoading } = useQuery({

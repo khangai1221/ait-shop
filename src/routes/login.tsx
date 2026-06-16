@@ -2,15 +2,18 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SignIn, SignUp } from "@clerk/clerk-react";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: z.object({ mode: z.enum(["login", "register"]).optional() }),
   head: () => ({ meta: [{ title: "Sign in — AirStep" }] }),
   component: Login,
 });
 
 function Login() {
   const { t } = useTranslation();
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const { mode: initialMode } = Route.useSearch();
+  const [mode, setMode] = useState<"login" | "register">(initialMode ?? "login");
   return (
     <div className="min-h-[80vh] grid lg:grid-cols-2">
       <div className="hidden lg:block relative bg-gradient-to-br from-[#3FBAEB] to-[#1B8FCB] overflow-hidden">

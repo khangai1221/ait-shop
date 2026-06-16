@@ -10,17 +10,27 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WishlistRouteImport } from './routes/wishlist'
+import { Route as SustainabilityRouteImport } from './routes/sustainability'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as ShippingRouteImport } from './routes/shipping'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SaleRouteImport } from './routes/sale'
+import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as PaymentOptionsRouteImport } from './routes/payment-options'
 import { Route as OrderSuccessRouteImport } from './routes/order-success'
+import { Route as NewsletterRouteImport } from './routes/newsletter'
+import { Route as NewsRouteImport } from './routes/news'
 import { Route as NewArrivalsRouteImport } from './routes/new-arrivals'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InvestorsRouteImport } from './routes/investors'
+import { Route as FindStoreRouteImport } from './routes/find-store'
+import { Route as FeedbackRouteImport } from './routes/feedback'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -32,9 +42,19 @@ const WishlistRoute = WishlistRouteImport.update({
   path: '/wishlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SustainabilityRoute = SustainabilityRouteImport.update({
+  id: '/sustainability',
+  path: '/sustainability',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShippingRoute = ShippingRouteImport.update({
+  id: '/shipping',
+  path: '/shipping',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -47,14 +67,34 @@ const SaleRoute = SaleRouteImport.update({
   path: '/sale',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ReturnsRoute = ReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentOptionsRoute = PaymentOptionsRouteImport.update({
+  id: '/payment-options',
+  path: '/payment-options',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrderSuccessRoute = OrderSuccessRouteImport.update({
   id: '/order-success',
   path: '/order-success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsletterRoute = NewsletterRouteImport.update({
+  id: '/newsletter',
+  path: '/newsletter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewArrivalsRoute = NewArrivalsRouteImport.update({
@@ -65,6 +105,21 @@ const NewArrivalsRoute = NewArrivalsRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestorsRoute = InvestorsRouteImport.update({
+  id: '/investors',
+  path: '/investors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FindStoreRoute = FindStoreRouteImport.update({
+  id: '/find-store',
+  path: '/find-store',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedbackRoute = FeedbackRouteImport.update({
+  id: '/feedback',
+  path: '/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -85,6 +140,11 @@ const CategoriesRoute = CategoriesRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -117,17 +177,27 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/feedback': typeof FeedbackRoute
+  '/find-store': typeof FindStoreRoute
+  '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/new-arrivals': typeof NewArrivalsRoute
+  '/news': typeof NewsRoute
+  '/newsletter': typeof NewsletterRoute
   '/order-success': typeof OrderSuccessRoute
+  '/payment-options': typeof PaymentOptionsRoute
   '/profile': typeof ProfileRoute
+  '/returns': typeof ReturnsRoute
   '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
+  '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/sustainability': typeof SustainabilityRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$id': typeof ProductIdRoute
@@ -136,17 +206,27 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/feedback': typeof FeedbackRoute
+  '/find-store': typeof FindStoreRoute
+  '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/new-arrivals': typeof NewArrivalsRoute
+  '/news': typeof NewsRoute
+  '/newsletter': typeof NewsletterRoute
   '/order-success': typeof OrderSuccessRoute
+  '/payment-options': typeof PaymentOptionsRoute
   '/profile': typeof ProfileRoute
+  '/returns': typeof ReturnsRoute
   '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
+  '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/sustainability': typeof SustainabilityRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$id': typeof ProductIdRoute
@@ -156,17 +236,27 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/careers': typeof CareersRoute
   '/cart': typeof CartRoute
   '/categories': typeof CategoriesRoute
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
+  '/feedback': typeof FeedbackRoute
+  '/find-store': typeof FindStoreRoute
+  '/investors': typeof InvestorsRoute
   '/login': typeof LoginRoute
   '/new-arrivals': typeof NewArrivalsRoute
+  '/news': typeof NewsRoute
+  '/newsletter': typeof NewsletterRoute
   '/order-success': typeof OrderSuccessRoute
+  '/payment-options': typeof PaymentOptionsRoute
   '/profile': typeof ProfileRoute
+  '/returns': typeof ReturnsRoute
   '/sale': typeof SaleRoute
   '/search': typeof SearchRoute
+  '/shipping': typeof ShippingRoute
   '/shop': typeof ShopRoute
+  '/sustainability': typeof SustainabilityRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
   '/product/$id': typeof ProductIdRoute
@@ -177,17 +267,27 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/careers'
     | '/cart'
     | '/categories'
     | '/checkout'
     | '/contact'
+    | '/feedback'
+    | '/find-store'
+    | '/investors'
     | '/login'
     | '/new-arrivals'
+    | '/news'
+    | '/newsletter'
     | '/order-success'
+    | '/payment-options'
     | '/profile'
+    | '/returns'
     | '/sale'
     | '/search'
+    | '/shipping'
     | '/shop'
+    | '/sustainability'
     | '/wishlist'
     | '/category/$slug'
     | '/product/$id'
@@ -196,17 +296,27 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/careers'
     | '/cart'
     | '/categories'
     | '/checkout'
     | '/contact'
+    | '/feedback'
+    | '/find-store'
+    | '/investors'
     | '/login'
     | '/new-arrivals'
+    | '/news'
+    | '/newsletter'
     | '/order-success'
+    | '/payment-options'
     | '/profile'
+    | '/returns'
     | '/sale'
     | '/search'
+    | '/shipping'
     | '/shop'
+    | '/sustainability'
     | '/wishlist'
     | '/category/$slug'
     | '/product/$id'
@@ -215,17 +325,27 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/careers'
     | '/cart'
     | '/categories'
     | '/checkout'
     | '/contact'
+    | '/feedback'
+    | '/find-store'
+    | '/investors'
     | '/login'
     | '/new-arrivals'
+    | '/news'
+    | '/newsletter'
     | '/order-success'
+    | '/payment-options'
     | '/profile'
+    | '/returns'
     | '/sale'
     | '/search'
+    | '/shipping'
     | '/shop'
+    | '/sustainability'
     | '/wishlist'
     | '/category/$slug'
     | '/product/$id'
@@ -235,17 +355,27 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  CareersRoute: typeof CareersRoute
   CartRoute: typeof CartRoute
   CategoriesRoute: typeof CategoriesRoute
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
+  FeedbackRoute: typeof FeedbackRoute
+  FindStoreRoute: typeof FindStoreRoute
+  InvestorsRoute: typeof InvestorsRoute
   LoginRoute: typeof LoginRoute
   NewArrivalsRoute: typeof NewArrivalsRoute
+  NewsRoute: typeof NewsRoute
+  NewsletterRoute: typeof NewsletterRoute
   OrderSuccessRoute: typeof OrderSuccessRoute
+  PaymentOptionsRoute: typeof PaymentOptionsRoute
   ProfileRoute: typeof ProfileRoute
+  ReturnsRoute: typeof ReturnsRoute
   SaleRoute: typeof SaleRoute
   SearchRoute: typeof SearchRoute
+  ShippingRoute: typeof ShippingRoute
   ShopRoute: typeof ShopRoute
+  SustainabilityRoute: typeof SustainabilityRoute
   WishlistRoute: typeof WishlistRoute
   CategorySlugRoute: typeof CategorySlugRoute
   ProductIdRoute: typeof ProductIdRoute
@@ -260,11 +390,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WishlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sustainability': {
+      id: '/sustainability'
+      path: '/sustainability'
+      fullPath: '/sustainability'
+      preLoaderRoute: typeof SustainabilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shipping': {
+      id: '/shipping'
+      path: '/shipping'
+      fullPath: '/shipping'
+      preLoaderRoute: typeof ShippingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -281,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SaleRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/returns': {
+      id: '/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof ReturnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -288,11 +439,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment-options': {
+      id: '/payment-options'
+      path: '/payment-options'
+      fullPath: '/payment-options'
+      preLoaderRoute: typeof PaymentOptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/order-success': {
       id: '/order-success'
       path: '/order-success'
       fullPath: '/order-success'
       preLoaderRoute: typeof OrderSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/newsletter': {
+      id: '/newsletter'
+      path: '/newsletter'
+      fullPath: '/newsletter'
+      preLoaderRoute: typeof NewsletterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/new-arrivals': {
@@ -307,6 +479,27 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investors': {
+      id: '/investors'
+      path: '/investors'
+      fullPath: '/investors'
+      preLoaderRoute: typeof InvestorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/find-store': {
+      id: '/find-store'
+      path: '/find-store'
+      fullPath: '/find-store'
+      preLoaderRoute: typeof FindStoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feedback': {
+      id: '/feedback'
+      path: '/feedback'
+      fullPath: '/feedback'
+      preLoaderRoute: typeof FeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -335,6 +528,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -379,17 +579,27 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  CareersRoute: CareersRoute,
   CartRoute: CartRoute,
   CategoriesRoute: CategoriesRoute,
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
+  FeedbackRoute: FeedbackRoute,
+  FindStoreRoute: FindStoreRoute,
+  InvestorsRoute: InvestorsRoute,
   LoginRoute: LoginRoute,
   NewArrivalsRoute: NewArrivalsRoute,
+  NewsRoute: NewsRoute,
+  NewsletterRoute: NewsletterRoute,
   OrderSuccessRoute: OrderSuccessRoute,
+  PaymentOptionsRoute: PaymentOptionsRoute,
   ProfileRoute: ProfileRoute,
+  ReturnsRoute: ReturnsRoute,
   SaleRoute: SaleRoute,
   SearchRoute: SearchRoute,
+  ShippingRoute: ShippingRoute,
   ShopRoute: ShopRoute,
+  SustainabilityRoute: SustainabilityRoute,
   WishlistRoute: WishlistRoute,
   CategorySlugRoute: CategorySlugRoute,
   ProductIdRoute: ProductIdRoute,
