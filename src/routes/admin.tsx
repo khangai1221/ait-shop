@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@clerk/clerk-react";
 import {
@@ -8,9 +8,9 @@ import {
   ArrowUpRight, ArrowDownRight, Trash2, Edit,
   X, Check, Shield, LogIn, Upload,
 } from "lucide-react";
-import { getProducts, createProduct, updateProduct, deleteProduct, getAdminStats, uploadProductImage } from "@/lib/api/products";
+import { getProducts, createProduct, updateProduct, deleteProduct, getAdminStats, uploadProductImage, importProducts } from "@/lib/api/products";
 import { getAllOrders, updateOrderStatus } from "@/lib/api/orders";
-import { getAllUsers } from "@/lib/api/users";
+import { getAllUsers, checkAdminAccess } from "@/lib/api/users";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -242,7 +242,7 @@ function DashboardSection() {
 function OrdersSection() {
   const { t } = useTranslation();
   const qc = useQueryClient();
-  const { data: orders = [], isLoading } = useQuery({ queryKey: ["admin-orders"], queryFn: () => getAllOrders() });
+  const { data: orders = [], isLoading, isError, error } = useQuery({ queryKey: ["admin-orders"], queryFn: () => getAllOrders() });
   const handleStatus = async (id: number, status: string) => {
     await updateOrderStatus({ data: { id, status: status as "confirmed" | "processing" | "shipped" | "delivered" | "cancelled" } });
     qc.invalidateQueries({ queryKey: ["admin-orders"] });
@@ -269,7 +269,8 @@ function OrdersSection() {
           </thead>
           <tbody>
             {isLoading && <tr><td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">{t("common.loading")}</td></tr>}
-            {!isLoading && orders.length === 0 && <tr><td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">{t("admin.noOrders")}</td></tr>}
+            {isError && <tr><td colSpan={7} className="px-5 py-8 text-center text-red-500">{error instanceof Error ? error.message : "Failed to load orders"}</td></tr>}
+            {!isLoading && !isError && orders.length === 0 && <tr><td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">{t("admin.noOrders")}</td></tr>}
             {orders.map((o) => (
               <tr key={o.id} className="border-t border-border hover:bg-muted/40">
                 <td className="px-5 py-3.5 font-medium">#{String(o.id).padStart(5, "0")}</td>
@@ -453,6 +454,25 @@ function ProductForm({
   const { t } = useTranslation();
   const [form, setForm] = useState<ProductFormData>(initial);
   const [uploading, setUploading] = useState(false);
+
+  const discountPercent = (() => {
+    const price = parseFloat(form.price);
+    const oldPrice = parseFloat(form.oldPrice);
+    if (!oldPrice || !price || oldPrice <= price) return null;
+    return Math.round(((oldPrice - price) / oldPrice) * 100);
+  })();
+
+  // Auto-fill the badge with the computed discount, but never overwrite a
+  // custom badge (e.g. "New") — only touch it if it's empty or was itself
+  // a previous auto-generated "-X%" badge.
+  useEffect(() => {
+    setForm((f) => {
+      const isAutoBadge = f.badge === "" || /^-\d+%$/.test(f.badge);
+      if (!isAutoBadge) return f;
+      const next = discountPercent !== null ? `-${discountPercent}%` : "";
+      return f.badge === next ? f : { ...f, badge: next };
+    });
+  }, [discountPercent]);
   const set =
     (key: Exclude<keyof ProductFormData, "imageUrls">) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -534,6 +554,9 @@ function ProductForm({
             onChange={set("oldPrice")}
             placeholder={t("common.optional")}
           />
+          {discountPercent !== null && (
+            <p className="mt-1 text-xs font-semibold text-brand">-{discountPercent}% off</p>
+          )}
         </FormField>
         <FormField label={t("common.stock")}>
           <input
@@ -568,7 +591,7 @@ function ProductForm({
       </div>
 
       {/* Multi-image upload */}
-      <FormField label={t("admin.images")}>
+      <FormField label={`${t("admin.images")} *`}>
         <div className="space-y-3">
           {form.imageUrls.length > 0 && (
             <div className="flex flex-wrap gap-2">
@@ -626,7 +649,7 @@ function ProductForm({
               />
             </label>
             {form.imageUrls.length === 0 && (
-              <span className="text-xs text-muted-foreground">{t("admin.noImages")}</span>
+              <span className="text-xs text-red-500 font-medium">{t("admin.noImages")}</span>
             )}
           </div>
           {form.imageUrls.length > 1 && (
@@ -652,7 +675,7 @@ function ProductForm({
       <div className="flex gap-3 pt-2">
         <button
           onClick={() => onSave(form)}
-          disabled={saving || uploading || !form.name || !form.price}
+          disabled={saving || uploading || !form.name || !form.price || form.imageUrls.length === 0}
           className="px-6 h-11 rounded-full bg-brand text-brand-foreground font-semibold text-sm hover:bg-brand-deep disabled:opacity-50 flex items-center gap-2"
         >
           {saving ? (
@@ -708,6 +731,36 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
   const [editId, setEditId] = useState<number | null>(null);
   const [editSaving, setEditSaving] = useState(false);
   const [search, setSearch] = useState("");
+  const [importing, setImporting] = useState(false);
+
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    if (ext !== "xlsx" && ext !== "docx") {
+      toast.error("Only .xlsx or .docx files are supported");
+      e.target.value = "";
+      return;
+    }
+    setImporting(true);
+    try {
+      const fileBase64 = await fileToBase64(file);
+      const result = await importProducts({ data: { fileBase64, fileType: ext } });
+      qc.invalidateQueries({ queryKey: ["admin-products"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      if (result.errors.length > 0) {
+        toast.error(`Imported ${result.inserted}, ${result.errors.length} row(s) skipped — see console`);
+        console.error("Import errors:", result.errors);
+      } else {
+        toast.success(`Imported ${result.inserted} products`);
+      }
+    } catch {
+      toast.error("Import failed");
+    } finally {
+      setImporting(false);
+      e.target.value = "";
+    }
+  };
 
   const filtered = prods.filter(
     (p) => p.name.toLowerCase().includes(search.toLowerCase()) || (p.category ?? "").toLowerCase().includes(search.toLowerCase())
@@ -769,6 +822,21 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
               className="h-9 pl-8 pr-3 rounded-full border border-border bg-muted/40 text-sm focus:outline-none focus:ring-2 focus:ring-brand w-44"
             />
           </div>
+          <label
+            className={`h-9 px-4 rounded-full border border-border text-sm font-medium flex items-center gap-1.5 cursor-pointer transition ${
+              importing ? "opacity-50 pointer-events-none" : "hover:bg-muted"
+            }`}
+          >
+            <Upload className="h-3.5 w-3.5" />
+            {importing ? "Importing..." : "Import (.xlsx/.docx)"}
+            <input
+              type="file"
+              accept=".xlsx,.docx"
+              className="sr-only"
+              onChange={handleImportFile}
+              disabled={importing}
+            />
+          </label>
           <button onClick={onAddNew} className="h-9 px-4 rounded-full bg-brand text-brand-foreground text-sm font-medium hover:bg-brand-deep flex items-center gap-1.5">
             <Plus className="h-3.5 w-3.5" /> {t("admin.addProduct")}
           </button>
@@ -843,7 +911,13 @@ function AdminPage() {
   const { isSignedIn, isLoaded } = useUser();
   const [activeSection, setActiveSection] = useState<Section>("dashboard");
 
-  if (!isLoaded) {
+  const { data: access, isLoading: accessLoading } = useQuery({
+    queryKey: ["admin-access"],
+    queryFn: () => checkAdminAccess(),
+    enabled: isLoaded && isSignedIn,
+  });
+
+  if (!isLoaded || (isSignedIn && accessLoading)) {
     return (
       <div className="min-h-screen grid place-items-center">
         <div className="h-8 w-8 rounded-full border-2 border-brand border-t-transparent animate-spin" />
@@ -863,6 +937,26 @@ function AdminPage() {
             className="inline-flex items-center gap-2 px-6 h-11 rounded-full bg-brand text-brand-foreground font-semibold hover:bg-brand-deep transition"
           >
             <LogIn className="h-4 w-4" /> {t("common.signIn")}
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (!access?.isAdmin) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-muted/30">
+        <div className="bg-card border border-border rounded-2xl p-10 max-w-sm w-full text-center">
+          <Shield className="h-10 w-10 text-red-500 mx-auto mb-4" />
+          <h2 className="font-display text-2xl mb-2">{t("admin.accessRequired")}</h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            This account does not have admin access.
+          </p>
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 px-6 h-11 rounded-full border border-border font-semibold hover:bg-muted transition"
+          >
+            {t("common.goHome")}
           </a>
         </div>
       </div>

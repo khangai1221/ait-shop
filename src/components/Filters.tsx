@@ -40,7 +40,7 @@ export function Filters({
                 : "hover:bg-muted text-muted-foreground"
             }`}
           >
-            {t("common.allCategories")}
+            {t("categories.all")}
           </button>
           {categories.map((c) => (
             <button

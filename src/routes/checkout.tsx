@@ -161,7 +161,7 @@ function Checkout() {
     await new Promise((r) => setTimeout(r, 600));
 
     try {
-      await createOrder({
+      const order = await createOrder({
         data: {
           email,
           displayName: `${firstName} ${lastName}`.trim() || user?.fullName || undefined,
@@ -177,7 +177,7 @@ function Checkout() {
         },
       });
       clearCart();
-      navigate({ to: "/order-success" });
+      navigate({ to: "/order-success", search: { orderId: order.id } });
     } catch (err) {
       console.error(err);
       toast.error(t("checkout.failed"));

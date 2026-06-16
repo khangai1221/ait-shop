@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "@/lib/api/products";
@@ -30,21 +30,14 @@ function Home() {
   const { addToCart } = useStore();
   const [size, setSize] = useState(42);
   const [color, setColor] = useState("#3B82F6");
-  const [heroProduct, setHeroProduct] = useState<any>(null);
-  const [products, setProducts] = useState<any[]>([]);
 
   const { data: dbProducts = [], isPending } = useQuery({
     queryKey: ["products"],
     queryFn: () => getProducts(),
   });
 
-  useEffect(() => {
-    const mapped = dbProducts.map(mapDbProduct);
-    setProducts(mapped);
-    if (mapped.length > 0) {
-      setHeroProduct(mapped[0]);
-    }
-  }, [dbProducts]);
+  const products = useMemo(() => dbProducts.map(mapDbProduct), [dbProducts]);
+  const heroProduct = products[0] ?? null;
 
   const thumbs = products.slice(0, 6);
 
@@ -99,7 +92,7 @@ function Home() {
 
           <div className="text-white order-1 lg:order-2">
             <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-white/80">
-              {t("common.featuredDrop")}
+              {t("home.featuredDrop")}
             </p>
             <h2 className="mt-2 sm:mt-3 font-display text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-[0.95]">
               {heroProduct.name}

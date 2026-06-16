@@ -3,20 +3,34 @@ import { z } from "zod";
 import { db, ensureReady } from "../db";
 import { products } from "../db/schema";
 import { eq, desc } from "drizzle-orm";
-import { requireAdmin, sanitize } from "../server-auth";
+import { requireAdmin, sanitize, checkRateLimit } from "../server-auth";
 
 const SUPABASE_URL = "https://soeoluptfhyaopjuqbjr.supabase.co";
 const BUCKET = "products";
+const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB
 
 export const uploadProductImage = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
-      fileName: z.string(),
-      fileBase64: z.string(),
+      fileName: z.string().max(255),
+      fileBase64: z.string().max(MAX_IMAGE_BYTES * 1.4), // base64 inflates size ~33%
       contentType: z.string(),
     })
   )
   .handler(async ({ data }) => {
+    const { userId } = await requireAdmin();
+    checkRateLimit(`upload:${userId}`, 30, 60_000);
+
+    if (!ALLOWED_IMAGE_TYPES.has(data.contentType)) {
+      throw new Error("Only JPEG, PNG, WebP, or GIF images are allowed");
+    }
+
+    const buffer = Buffer.from(data.fileBase64, "base64");
+    if (buffer.length > MAX_IMAGE_BYTES) {
+      throw new Error("Image must be smaller than 8MB");
+    }
+
     const { createClient } = await import("@supabase/supabase-js");
     const supabase = createClient(SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY!);
 
@@ -26,7 +40,6 @@ export const uploadProductImage = createServerFn({ method: "POST" })
       await supabase.storage.createBucket(BUCKET, { public: true });
     }
 
-    const buffer = Buffer.from(data.fileBase64, "base64");
     const safeName = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
     const path = `${Date.now()}-${safeName}`;
 
@@ -186,6 +199,129 @@ export const deleteProduct = createServerFn({ method: "POST" })
     await requireAdmin();
     await db.delete(products).where(eq(products.id, data.id));
     return { success: true };
+  });
+
+// ── Bulk import from Excel (.xlsx) or Word (.docx) ───────────────────────────
+
+const IMPORT_FIELD_MAP: Record<string, string> = {
+  name: "name",
+  price: "price",
+  oldprice: "oldPrice",
+  stock: "stock",
+  category: "category",
+  badge: "badge",
+  description: "description",
+  colors: "colors",
+  sizes: "sizes",
+  rating: "rating",
+  imageurl: "imageUrl",
+};
+
+async function parseXlsxRows(buffer: Buffer): Promise<Record<string, unknown>[]> {
+  const XLSX = await import("xlsx");
+  const workbook = XLSX.read(buffer, { type: "buffer" });
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  return XLSX.utils.sheet_to_json(sheet, { defval: "" });
+}
+
+async function parseDocxRows(buffer: Buffer): Promise<Record<string, unknown>[]> {
+  const mammoth = await import("mammoth");
+  const cheerio = await import("cheerio");
+  const { value: html } = await mammoth.convertToHtml({ buffer });
+  const $ = cheerio.load(html);
+  const table = $("table").first();
+  if (table.length === 0) return [];
+  const trs = table.find("tr");
+  const headerCells = $(trs[0])
+    .find("td, th")
+    .map((_, el) => $(el).text().trim())
+    .get();
+  const rows: Record<string, unknown>[] = [];
+  trs.slice(1).each((_, tr) => {
+    const cells = $(tr)
+      .find("td, th")
+      .map((_, el) => $(el).text().trim())
+      .get();
+    const obj: Record<string, unknown> = {};
+    headerCells.forEach((h, i) => {
+      obj[h] = cells[i] ?? "";
+    });
+    rows.push(obj);
+  });
+  return rows;
+}
+
+export const importProducts = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      fileBase64: z.string(),
+      fileType: z.enum(["xlsx", "docx"]),
+    }),
+  )
+  .handler(async ({ data }) => {
+    await requireAdmin();
+    await ensureReady();
+
+    const buffer = Buffer.from(data.fileBase64, "base64");
+    const rawRows =
+      data.fileType === "xlsx" ? await parseXlsxRows(buffer) : await parseDocxRows(buffer);
+
+    const toInsert: (typeof products.$inferInsert)[] = [];
+    const errors: string[] = [];
+
+    rawRows.forEach((raw, idx) => {
+      const row: Record<string, string> = {};
+      for (const [key, value] of Object.entries(raw)) {
+        const norm = key.toLowerCase().replace(/[\s_]+/g, "");
+        const field = IMPORT_FIELD_MAP[norm];
+        if (field) row[field] = String(value ?? "").trim();
+      }
+
+      const name = row.name;
+      const price = parseFloat(row.price);
+
+      if (!name) {
+        errors.push(`Row ${idx + 2}: missing name`);
+        return;
+      }
+      if (!price || price <= 0) {
+        errors.push(`Row ${idx + 2} (${name}): missing or invalid price`);
+        return;
+      }
+
+      const oldPriceNum = row.oldPrice ? parseFloat(row.oldPrice) : null;
+      const stockNum = row.stock ? parseInt(row.stock, 10) : 0;
+      const ratingNum = row.rating ? parseFloat(row.rating) : null;
+      const colorsArr = row.colors
+        ? row.colors.split(",").map((c) => c.trim()).filter(Boolean)
+        : null;
+      const sizesArr = row.sizes
+        ? row.sizes
+            .split(",")
+            .map((s) => parseFloat(s.trim()))
+            .filter((n) => !isNaN(n))
+        : null;
+
+      toInsert.push({
+        name: sanitize(name, 200),
+        price,
+        oldPrice: oldPriceNum && oldPriceNum > 0 ? oldPriceNum : null,
+        stock: isNaN(stockNum) ? 0 : stockNum,
+        description: row.description ? sanitize(row.description, 2000) : null,
+        imageUrl: row.imageUrl || null,
+        category: row.category || null,
+        badge: row.badge ? sanitize(row.badge, 50) : null,
+        colors: colorsArr && colorsArr.length > 0 ? JSON.stringify(colorsArr) : null,
+        sizes: sizesArr && sizesArr.length > 0 ? JSON.stringify(sizesArr) : null,
+        rating: ratingNum,
+      });
+    });
+
+    if (toInsert.length > 0) {
+      await db.insert(products).values(toInsert);
+    }
+
+    return { inserted: toInsert.length, errors };
   });
 
 export const getAdminStats = createServerFn({ method: "GET" }).handler(async () => {

@@ -47,7 +47,7 @@ export function checkRateLimit(key: string, limit: number, windowMs: number): vo
   }
 }
 
-function clientIP(): string {
+export function clientIP(): string {
   try {
     const fwd = getRequestHeader("x-forwarded-for");
     if (fwd) return fwd.split(",")[0].trim();
@@ -104,14 +104,16 @@ export async function requireAdmin(): Promise<{ userId: string }> {
   // Slow path: check ADMIN_EMAILS env var via Clerk API
   const adminEmails = (process.env.ADMIN_EMAILS ?? "")
     .split(",")
-    .map((e) => e.trim())
+    .map((e) => e.trim().toLowerCase())
     .filter(Boolean);
 
   if (adminEmails.length > 0) {
     const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY! });
     const clerkUser = await clerk.users.getUser(userId);
-    const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
-    if (adminEmails.includes(email)) return { userId };
+    const primaryEmail =
+      clerkUser.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
+        ?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress ?? "";
+    if (adminEmails.includes(primaryEmail.toLowerCase())) return { userId };
   }
 
   throw new AuthError(403, "Forbidden");

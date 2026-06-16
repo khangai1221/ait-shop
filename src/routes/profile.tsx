@@ -36,7 +36,7 @@ function Profile() {
 
   const { data: orders = [], isLoading: ordersLoading } = useQuery({
     queryKey: ["user-orders", email],
-    queryFn: () => getOrdersByEmail({ data: { email } }),
+    queryFn: () => getOrdersByEmail(),
     enabled: !!email && tab === "orders",
   });
 

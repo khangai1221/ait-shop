@@ -3,16 +3,31 @@ import postgres from "postgres";
 import * as schema from "./schema";
 import { sql } from "drizzle-orm";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL is not set. Go to Supabase → Project Settings → Database → Connection string (Transaction pooler) and add it to your .env and Vercel environment variables."
-  );
+// Lazily created so a missing DATABASE_URL throws only when a query actually
+// runs (inside a handler's try/catch), not at module-import time — which
+// would otherwise crash every server function that imports this file.
+let _db: ReturnType<typeof drizzle<typeof schema>> | undefined;
+
+function getDb() {
+  if (!_db) {
+    const url = process.env.DATABASE_URL;
+    if (!url) {
+      throw new Error(
+        "DATABASE_URL is not set. Go to Supabase → Project Settings → Database → Connection string (Transaction pooler) and add it to your .env and Vercel environment variables."
+      );
+    }
+    // prepare: false is required for Supabase's PgBouncer connection pooler
+    const client = postgres(url, { prepare: false });
+    _db = drizzle(client, { schema });
+  }
+  return _db;
 }
 
-// prepare: false is required for Supabase's PgBouncer connection pooler
-const client = postgres(process.env.DATABASE_URL, { prepare: false });
-
-export const db = drizzle(client, { schema });
+export const db = new Proxy({} as ReturnType<typeof drizzle<typeof schema>>, {
+  get(_target, prop, receiver) {
+    return Reflect.get(getDb(), prop, receiver);
+  },
+});
 
 let _initPromise: Promise<void> | undefined;
 

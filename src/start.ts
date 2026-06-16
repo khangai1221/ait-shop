@@ -1,7 +1,6 @@
-import { createStart, createMiddleware } from "@tanstack/react-start";
+import { createStart, createMiddleware, createCsrfMiddleware } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import "./i18n";
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
   try {
@@ -18,6 +17,23 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+const csrfMiddleware = createCsrfMiddleware({
+  filter: (ctx) => ctx.handlerType === "serverFn",
+});
+
+const securityHeadersMiddleware = createMiddleware().server(async ({ next }) => {
+  const result = await next();
+  result.response.headers.set("X-Frame-Options", "DENY");
+  result.response.headers.set("X-Content-Type-Options", "nosniff");
+  result.response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  result.response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  result.response.headers.set(
+    "Strict-Transport-Security",
+    "max-age=63072000; includeSubDomains; preload",
+  );
+  return result;
+});
+
 export const startInstance = createStart(() => ({
-  requestMiddleware: [errorMiddleware],
+  requestMiddleware: [csrfMiddleware, securityHeadersMiddleware, errorMiddleware],
 }));

@@ -3,7 +3,16 @@ import { z } from "zod";
 import { db, ensureReady } from "../db";
 import { users, orders } from "../db/schema";
 import { eq, desc, sql } from "drizzle-orm";
-import { requireAdmin, sanitize } from "../server-auth";
+import { requireAdmin, sanitize, checkRateLimit, clientIP } from "../server-auth";
+
+export const checkAdminAccess = createServerFn({ method: "GET" }).handler(async () => {
+  try {
+    await requireAdmin();
+    return { isAdmin: true };
+  } catch {
+    return { isAdmin: false };
+  }
+});
 
 export const getAllUsers = createServerFn({ method: "GET" }).handler(async () => {
   await requireAdmin();
@@ -32,6 +41,7 @@ export const getOrCreateUser = createServerFn({ method: "POST" })
     })
   )
   .handler(async ({ data }) => {
+    checkRateLimit(`getuser:${clientIP()}`, 30, 60_000);
     await ensureReady();
     let [user] = await db.select().from(users).where(eq(users.email, data.email));
     if (!user) {
@@ -50,27 +60,5 @@ export const getOrCreateUser = createServerFn({ method: "POST" })
         .where(eq(users.id, user.id))
         .returning();
     }
-    return user;
-  });
-
-export const updateUserProfile = createServerFn({ method: "POST" })
-  .inputValidator(
-    z.object({
-      email: z.string().email().max(254),
-      displayName: z.string().max(200).optional(),
-      shippingAddress: z.string().max(500).optional(),
-      billingAddress: z.string().max(500).optional(),
-    }),
-  )
-  .handler(async ({ data }) => {
-    await ensureReady();
-    const { email, ...rest } = data;
-    const updateData = {
-      ...rest,
-      ...(rest.displayName !== undefined && { displayName: sanitize(rest.displayName) }),
-      ...(rest.shippingAddress !== undefined && { shippingAddress: sanitize(rest.shippingAddress) }),
-      ...(rest.billingAddress !== undefined && { billingAddress: sanitize(rest.billingAddress) }),
-    };
-    const [user] = await db.update(users).set(updateData).where(eq(users.email, email)).returning();
     return user;
   });

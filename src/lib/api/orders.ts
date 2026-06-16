@@ -1,10 +1,20 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createClerkClient } from "@clerk/backend";
 import { db, ensureReady } from "../db";
 import { orders, orderItems, users } from "../db/schema";
 import { eq, desc } from "drizzle-orm";
-import { requireAdmin, checkRateLimit, sanitize } from "../server-auth";
+import { requireAdmin, requireAuth, checkRateLimit, sanitize } from "../server-auth";
 import { getCookie } from "@tanstack/react-start/server";
+
+async function getAuthenticatedEmail(userId: string): Promise<string | null> {
+  const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY! });
+  const clerkUser = await clerk.users.getUser(userId);
+  return (
+    clerkUser.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
+      ?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress ?? null
+  );
+}
 
 export const getAllOrders = createServerFn({ method: "GET" }).handler(async () => {
   await requireAdmin();
@@ -27,28 +37,29 @@ export const getAllOrders = createServerFn({ method: "GET" }).handler(async () =
   return rows;
 });
 
-export const getOrdersByEmail = createServerFn({ method: "POST" })
-  .inputValidator(z.object({ email: z.string().email() }))
-  .handler(async ({ data }) => {
-    await ensureReady();
-    const [user] = await db.select().from(users).where(eq(users.email, data.email));
-    if (!user) return [];
-    const userOrders = await db
-      .select()
-      .from(orders)
-      .where(eq(orders.userId, user.id))
-      .orderBy(desc(orders.orderDate));
-    const ordersWithItems = await Promise.all(
-      userOrders.map(async (order) => {
-        const items = await db
-          .select()
-          .from(orderItems)
-          .where(eq(orderItems.orderId, order.id));
-        return { ...order, items };
-      })
-    );
-    return ordersWithItems;
-  });
+export const getOrdersByEmail = createServerFn({ method: "GET" }).handler(async () => {
+  const { userId } = await requireAuth();
+  await ensureReady();
+  const email = await getAuthenticatedEmail(userId);
+  if (!email) return [];
+  const [user] = await db.select().from(users).where(eq(users.email, email));
+  if (!user) return [];
+  const userOrders = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.userId, user.id))
+    .orderBy(desc(orders.orderDate));
+  const ordersWithItems = await Promise.all(
+    userOrders.map(async (order) => {
+      const items = await db
+        .select()
+        .from(orderItems)
+        .where(eq(orderItems.orderId, order.id));
+      return { ...order, items };
+    })
+  );
+  return ordersWithItems;
+});
 
 export const createOrder = createServerFn({ method: "POST" })
   .inputValidator(

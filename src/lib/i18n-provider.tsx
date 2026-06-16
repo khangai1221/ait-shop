@@ -106,6 +106,7 @@ const resources = {
         outOfStock: "Out of stock",
         onlyLeft: "Only {{count}} left",
         lowStock: "Low stock",
+        upTo: "Up to",
       },
       error: {
         pageNotFound: "Page not found",
@@ -444,6 +445,7 @@ const resources = {
         outOfStock: "Нөөцгүй",
         onlyLeft: "Зөвхөн {{count}} үлдсэн",
         lowStock: "Нөөц багатай",
+        upTo: "Хүртэл",
       },
       error: {
         pageNotFound: "Хуудас олдсонгүй",
@@ -696,5 +698,14 @@ if (!i18n.isInitialized) {
 export { i18n };
 
 export function I18nProvider({ children }: { children: ReactNode }) {
+  // `i18n` is a module-level singleton reused across requests in the same
+  // server process. If a prior request (or HMR reload) left it on a
+  // different language, the next SSR render would emit stale text while a
+  // fresh client always starts at "mn" — causing a hydration mismatch.
+  // Force it back to "mn" on every server render; never touch it client-side
+  // so the user's language toggle keeps working after hydration.
+  if (typeof window === "undefined" && i18n.language !== "mn") {
+    i18n.changeLanguage("mn");
+  }
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }
