@@ -10,7 +10,7 @@ import { useLanguage } from "@/lib/language";
 import { formatPrice } from "@/lib/format-price";
 
 export const Route = createFileRoute("/wishlist")({
-  head: () => ({ meta: [{ title: "Wishlist — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Wishlist — AIT Shop" }] }),
   component: Wishlist,
 });
 

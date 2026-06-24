@@ -10,7 +10,7 @@ import { useLanguage } from "@/lib/language";
 import { formatPrice } from "@/lib/format-price";
 
 export const Route = createFileRoute("/checkout")({
-  head: () => ({ meta: [{ title: "Checkout — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Checkout — AIT Shop" }] }),
   component: Checkout,
 });
 
@@ -102,7 +102,7 @@ function FakeQRCode({ total }: { total: number }) {
           <p className="font-display text-2xl mt-1 text-[#0057b7]">
             ₮{totalMnt.toLocaleString("mn-MN")}
           </p>
-          <p className="text-xs text-muted-foreground mt-1">AirStep Mongolia</p>
+          <p className="text-xs text-muted-foreground mt-1">AIT Shop Mongolia</p>
         </div>
       </div>
     </div>

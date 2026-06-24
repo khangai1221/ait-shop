@@ -7,7 +7,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/sale")({
-  head: () => ({ meta: [{ title: "Sale — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Sale — AIT Shop" }] }),
   component: SalePage,
 });
 

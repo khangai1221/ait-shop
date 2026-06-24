@@ -33,12 +33,12 @@ export const getAllUsers = createServerFn({ method: "GET" }).handler(async () =>
 });
 
 export const getOrCreateUser = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     z.object({
       email: z.string().email(),
       clerkId: z.string().optional(),
       displayName: z.string().optional(),
-    })
+    }),
   )
   .handler(async ({ data }) => {
     checkRateLimit(`getuser:${clientIP()}`, 30, 60_000);

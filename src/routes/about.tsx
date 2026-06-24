@@ -4,7 +4,7 @@ import shoe2 from "@/assets/shoe-6.png";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({ meta: [{ title: "About — AirStep" }] }),
+   head: () => ({ meta: [{ title: "About — AIT Shop" }] }),
   component: About,
 });
 

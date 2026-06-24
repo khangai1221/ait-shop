@@ -81,25 +81,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AirStep — Premium Sneakers & Athletic Footwear" },
+      { title: "AIT Shop — Premium Sneakers & Athletic Footwear" },
       {
         name: "description",
         content:
-          "Discover AirStep — modern sneakers for running, basketball, training and everyday style.",
+          "Discover AIT Shop — modern sneakers for running, basketball, training and everyday style.",
       },
-      { property: "og:title", content: "AirStep — Premium Sneakers & Athletic Footwear" },
+      { property: "og:title", content: "AIT Shop — Premium Sneakers & Athletic Footwear" },
       {
         property: "og:description",
         content:
-          "Discover AirStep — modern sneakers for running, basketball, training and everyday style.",
+          "Discover AIT Shop — modern sneakers for running, basketball, training and everyday style.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "AirStep — Premium Sneakers & Athletic Footwear" },
+      { name: "twitter:title", content: "AIT Shop — Premium Sneakers & Athletic Footwear" },
       {
         name: "twitter:description",
         content:
-          "Discover AirStep — modern sneakers for running, basketball, training and everyday style.",
+          "Discover AIT Shop — modern sneakers for running, basketball, training and everyday style.",
       },
       {
         property: "og:image",
@@ -113,6 +113,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
+      { rel: "icon", type: "image/jpeg", href: "https://scontent.fsin15-2.fna.fbcdn.net/v/t1.15752-9/467483286_956491719731551_4684893202213182403_n.jpg?stp=dst-jpg_p120x120_tt6&_nc_cat=107&ccb=1-7&_nc_sid=029a7d&_nc_ohc=hdYyXLdJg-EQ7kNvwEK2IVz&_nc_oc=AdqXyO-rUBV5QmW2BY_jnP_uZwLqFp2qa75XzaedJ1ES6twbO72uqB7WS_0wXcqNBVs&_nc_zt=23&_nc_ht=scontent.fsin15-2.fna&_nc_ss=7b2a8&oh=03_Q7cD5gGGvJm47O7iJFKBdjxV7m1FvdkcnTZjp_uVpF-G3-2idw&oe=6A5945C7" },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

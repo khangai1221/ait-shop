@@ -93,7 +93,7 @@ export function Footer() {
             </li>
           </ul>
         </FooterSection>
-        <FooterSection title={t("common.aboutAirStep")}>
+        <FooterSection title={t("common.aboutAITShop")}>
           <ul className="space-y-2.5 text-sm text-white/70 pb-2">
             <li>
               <Link to="/news" className="hover:text-white transition">
@@ -135,7 +135,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-3 justify-between text-xs text-white/50 text-center md:text-left">
           <p>
-            © {new Date().getFullYear()} AirStep, Inc. {t("common.allRightsReserved")}
+            © {new Date().getFullYear()} AIT Shop by AIT Nomad LLC. {t("common.allRightsReserved")}
           </p>
           <div className="flex gap-4 justify-center">
             <a href="#" className="hover:text-white transition">

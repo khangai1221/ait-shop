@@ -11,8 +11,8 @@ import { useTranslation } from "react-i18next";
 export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
-      { title: "Shop All Sneakers — AirStep" },
-      { name: "description", content: "Browse the full AirStep collection." },
+      { title: "Shop All Sneakers — AIT Shop" },
+      { name: "description", content: "Browse the full AIT Shop collection." },
     ],
   }),
   component: Shop,

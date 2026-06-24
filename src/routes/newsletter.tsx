@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/newsletter")({
-  head: () => ({ meta: [{ title: "Newsletter — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Newsletter — AIT Shop" }] }),
   component: Newsletter,
 });
 

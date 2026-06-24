@@ -80,10 +80,14 @@ export function Navbar() {
             to="/"
             className="flex items-center gap-2.5 font-display text-xl tracking-tight shrink-0"
           >
-            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-brand text-brand-foreground shadow-lg shadow-brand/20">
-              <span className="text-sm font-bold">A</span>
+            <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl overflow-hidden shadow-lg shadow-brand/20">
+              <img
+                src="https://scontent.fsin15-2.fna.fbcdn.net/v/t1.15752-9/467483286_956491719731551_4684893202213182403_n.jpg?stp=dst-jpg_p120x120_tt6&_nc_cat=107&ccb=1-7&_nc_sid=029a7d&_nc_ohc=hdYyXLdJg-EQ7kNvwEK2IVz&_nc_oc=AdqXyO-rUBV5QmW2BY_jnP_uZwLqFp2qa75XzaedJ1ES6twbO72uqB7WS_0wXcqNBVs&_nc_zt=23&_nc_ht=scontent.fsin15-2.fna&_nc_ss=7b2a8&oh=03_Q7cD5gGGvJm47O7iJFKBdjxV7m1FvdkcnTZjp_uVpF-G3-2idw&oe=6A5945C7"
+                alt="AIT Shop logo"
+                className="h-full w-full object-cover"
+              />
             </span>
-            <span className="text-ink font-bold hidden sm:inline">AirStep</span>
+            <span className="text-ink font-bold hidden sm:inline">AIT Shop</span>
           </Link>
 
           {/* Desktop nav */}

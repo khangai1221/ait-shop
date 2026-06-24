@@ -11,7 +11,7 @@ export const Route = createFileRoute("/profile")({
   validateSearch: z.object({
     tab: z.enum(["profile", "orders", "addresses", "settings"]).optional(),
   }),
-  head: () => ({ meta: [{ title: "My account — AirStep" }] }),
+   head: () => ({ meta: [{ title: "My account — AIT Shop" }] }),
   component: Profile,
 });
 

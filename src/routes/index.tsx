@@ -14,10 +14,10 @@ import { formatPrice } from "@/lib/format-price";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AirStep — Step Into Motion" },
+      { title: "AIT Shop — Step Into Motion" },
       {
         name: "description",
-        content: "Bold sneakers built for every stride. Shop the latest drops from AirStep.",
+        content: "Bold sneakers built for every stride. Shop the latest drops from AIT Shop.",
       },
     ],
   }),
@@ -182,7 +182,7 @@ function Home() {
                 className={`relative ${tints[i]} rounded-3xl p-6 text-white overflow-hidden group h-80`}
               >
                 <div className="flex justify-between items-start">
-                  <div className="font-display text-xs">AIRSTEP</div>
+                  <div className="font-display text-xs">AIT SHOP</div>
                   <span className="font-display text-xl">{formatPrice(p.price, language)}</span>
                 </div>
                 <h3 className="font-display text-2xl mt-2 max-w-[60%]">{p.name}</h3>

@@ -11,8 +11,9 @@ async function getAuthenticatedEmail(userId: string): Promise<string | null> {
   const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY! });
   const clerkUser = await clerk.users.getUser(userId);
   return (
-    clerkUser.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
-      ?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress ?? null
+    clerkUser.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)?.emailAddress ??
+    clerkUser.emailAddresses[0]?.emailAddress ??
+    null
   );
 }
 
@@ -51,18 +52,15 @@ export const getOrdersByEmail = createServerFn({ method: "GET" }).handler(async 
     .orderBy(desc(orders.orderDate));
   const ordersWithItems = await Promise.all(
     userOrders.map(async (order) => {
-      const items = await db
-        .select()
-        .from(orderItems)
-        .where(eq(orderItems.orderId, order.id));
+      const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
       return { ...order, items };
-    })
+    }),
   );
   return ordersWithItems;
 });
 
 export const createOrder = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     z.object({
       email: z.string().email().max(254),
       displayName: z.string().max(200).optional(),
@@ -127,7 +125,7 @@ export const createOrder = createServerFn({ method: "POST" })
 const VALID_STATUSES = ["confirmed", "processing", "shipped", "delivered", "cancelled"] as const;
 
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .inputValidator(
+  .validator(
     z.object({
       id: z.number(),
       status: z.enum(VALID_STATUSES),

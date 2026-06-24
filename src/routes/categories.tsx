@@ -3,7 +3,7 @@ import { categories, products } from "@/lib/mock-data";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/categories")({
-  head: () => ({ meta: [{ title: "Categories — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Categories — AIT Shop" }] }),
   component: Categories,
 });
 

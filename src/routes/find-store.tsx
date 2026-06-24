@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage, InfoSection } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/find-store")({
-  head: () => ({ meta: [{ title: "Find a store — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Find a store — AIT Shop" }] }),
   component: FindStore,
 });
 

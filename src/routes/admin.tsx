@@ -3,19 +3,42 @@ import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useUser } from "@clerk/clerk-react";
 import {
-  LayoutDashboard, ShoppingCart, Users, Package,
-  Plus, List, Bell, Search, User, ChevronDown,
-  ArrowUpRight, ArrowDownRight, Trash2, Edit,
-  X, Check, Shield, LogIn, Upload,
+  LayoutDashboard,
+  ShoppingCart,
+  Users,
+  Package,
+  Plus,
+  List,
+  Bell,
+  Search,
+  User,
+  ChevronDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Trash2,
+  Edit,
+  X,
+  Check,
+  Shield,
+  LogIn,
+  Upload,
 } from "lucide-react";
-import { getProducts, createProduct, updateProduct, deleteProduct, getAdminStats, uploadProductImage, importProducts } from "@/lib/api/products";
+import {
+  getProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  getAdminStats,
+  uploadProductImage,
+  importProducts,
+} from "@/lib/api/products";
 import { getAllOrders, updateOrderStatus } from "@/lib/api/orders";
 import { getAllUsers, checkAdminAccess } from "@/lib/api/users";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin Dashboard — AirStep" }] }),
+  head: () => ({ meta: [{ title: "Admin Dashboard — AIT Shop" }] }),
   component: AdminPage,
 });
 
@@ -32,7 +55,8 @@ const STATUS_COLORS: Record<string, string> = {
 
 const ORDER_STATUSES = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
 const CATEGORIES = ["Running", "Basketball", "Lifestyle", "Training", "Sneakers", "Sale"];
-const inputCls = "w-full h-11 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-brand";
+const inputCls =
+  "w-full h-11 px-3 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-brand";
 
 function FormField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -45,14 +69,20 @@ function FormField({ label, children }: { label: string; children: React.ReactNo
 
 function StatusBadge({ status }: { status: string }) {
   return (
-    <span className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[status] ?? "bg-muted text-muted-foreground"}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full capitalize ${STATUS_COLORS[status] ?? "bg-muted text-muted-foreground"}`}
+    >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {status}
     </span>
   );
 }
 
-function AdminLayout({ activeSection, setActiveSection, children }: {
+function AdminLayout({
+  activeSection,
+  setActiveSection,
+  children,
+}: {
   activeSection: Section;
   setActiveSection: (s: Section) => void;
   children: React.ReactNode;
@@ -71,17 +101,33 @@ function AdminLayout({ activeSection, setActiveSection, children }: {
 
   return (
     <div className="flex min-h-screen bg-muted/30">
-      <aside className={`bg-[#1A2B4C] text-white flex flex-col transition-all duration-300 shrink-0 ${collapsed ? "w-[72px]" : "w-[240px]"}`}>
+      <aside
+        className={`bg-[#1A2B4C] text-white flex flex-col transition-all duration-300 shrink-0 ${collapsed ? "w-[72px]" : "w-[240px]"}`}
+      >
         <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-          {!collapsed && <span className="font-display text-lg">AIR<span className="text-brand">STEP</span></span>}
-          {collapsed && <span className="font-display text-sm mx-auto">A</span>}
+          <img
+            src="https://scontent.fsin15-2.fna.fbcdn.net/v/t1.15752-9/467483286_956491719731551_4684893202213182403_n.jpg?stp=dst-jpg_p120x120_tt6&_nc_cat=107&ccb=1-7&_nc_sid=029a7d&_nc_ohc=hdYyXLdJg-EQ7kNvwEK2IVz&_nc_oc=AdqXyO-rUBV5QmW2BY_jnP_uZwLqFp2qa75XzaedJ1ES6twbO72uqB7WS_0wXcqNBVs&_nc_zt=23&_nc_ht=scont65ent.fsin15-2.fna&_nc_ss=7b2a8&oh=03_Q7cD5gGGvJm47O7iJFKBdjxV7m1FvdkcnTZjp_uVpF-G3-2idw&oe=6A5945C7"
+            alt="AIT Shop logo"
+            className={`shrink-0 object-cover ${collapsed ? "h-8 w-8 rounded-lg" : "h-8 w-8 rounded-lg"}`}
+          />
           {!collapsed && (
-            <button onClick={() => setCollapsed(true)} className="ml-auto p-1 rounded hover:bg-white/10">
+            <span className="font-display text-lg">
+              AIT <span className="text-brand">SHOP</span>
+            </span>
+          )}
+          {!collapsed && (
+            <button
+              onClick={() => setCollapsed(true)}
+              className="ml-auto p-1 rounded hover:bg-white/10"
+            >
               <X className="h-3.5 w-3.5" />
             </button>
           )}
           {collapsed && (
-            <button onClick={() => setCollapsed(false)} className="p-1 rounded hover:bg-white/10 ml-auto">
+            <button
+              onClick={() => setCollapsed(false)}
+              className="p-1 rounded hover:bg-white/10 ml-auto"
+            >
               <ChevronDown className="h-3 w-3 -rotate-90" />
             </button>
           )}
@@ -113,8 +159,12 @@ function AdminLayout({ activeSection, setActiveSection, children }: {
             </div>
             {!collapsed && (
               <div className="min-w-0">
-                <p className="text-xs font-medium truncate">{user?.fullName ?? t("common.admin")}</p>
-                <p className="text-[10px] text-white/50 truncate">{user?.primaryEmailAddress?.emailAddress ?? ""}</p>
+                <p className="text-xs font-medium truncate">
+                  {user?.fullName ?? t("common.admin")}
+                </p>
+                <p className="text-[10px] text-white/50 truncate">
+                  {user?.primaryEmailAddress?.emailAddress ?? ""}
+                </p>
               </div>
             )}
           </div>
@@ -149,25 +199,47 @@ function AdminLayout({ activeSection, setActiveSection, children }: {
 function DashboardSection() {
   const { t } = useTranslation();
   const { data: stats } = useQuery({ queryKey: ["admin-stats"], queryFn: () => getAdminStats() });
-  const { data: orders = [] } = useQuery({ queryKey: ["admin-orders"], queryFn: () => getAllOrders() });
+  const { data: orders = [] } = useQuery({
+    queryKey: ["admin-orders"],
+    queryFn: () => getAllOrders(),
+  });
   const totalRevenue = orders.reduce((s, o) => s + o.totalAmount, 0);
   const pendingCount = orders.filter((o) => o.status === "pending").length;
   const cancelledCount = orders.filter((o) => o.status === "cancelled").length;
   const WEEK_DATA = [52, 40, 38, 28, 41, 55, 49, 42, 36, 28, 34, 25];
   const maxV = Math.max(...WEEK_DATA);
-  const H = 160; const W = 100;
+  const H = 160;
+  const W = 100;
   const step = W / (WEEK_DATA.length - 1);
-  const linePath = WEEK_DATA.map((v, i) => `${i === 0 ? "M" : "L"} ${i * step} ${H - (v / maxV) * H}`).join(" ");
+  const linePath = WEEK_DATA.map(
+    (v, i) => `${i === 0 ? "M" : "L"} ${i * step} ${H - (v / maxV) * H}`,
+  ).join(" ");
   const areaPath = `${linePath} L ${W} ${H} L 0 ${H} Z`;
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {[
-          { label: t("common.customers"), value: String(new Set(orders.map((o) => o.userId)).size || 0), color: "bg-blue-500" },
-          { label: t("common.products"), value: String(stats?.totalProducts ?? "..."), color: "bg-teal-500" },
+          {
+            label: t("common.customers"),
+            value: String(new Set(orders.map((o) => o.userId)).size || 0),
+            color: "bg-blue-500",
+          },
+          {
+            label: t("common.products"),
+            value: String(stats?.totalProducts ?? "..."),
+            color: "bg-teal-500",
+          },
           { label: "In Stock", value: String(stats?.inStock ?? "..."), color: "bg-emerald-500" },
-          { label: "Out of Stock", value: String(stats?.outOfStock ?? "..."), color: "bg-orange-500" },
-          { label: "Revenue", value: `₮${totalRevenue.toLocaleString("mn-MN")}`, color: "bg-sky-500" },
+          {
+            label: "Out of Stock",
+            value: String(stats?.outOfStock ?? "..."),
+            color: "bg-orange-500",
+          },
+          {
+            label: "Revenue",
+            value: `₮${totalRevenue.toLocaleString("mn-MN")}`,
+            color: "bg-sky-500",
+          },
         ].map((it) => (
           <div key={it.label} className="bg-card rounded-2xl border border-border p-4">
             <p className="text-xs text-muted-foreground">{it.label}</p>
@@ -179,15 +251,32 @@ function DashboardSection() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
           {[
-            { label: "Total Revenue", value: `₮${totalRevenue.toLocaleString("mn-MN")}`, sub: "All time", up: true },
+            {
+              label: "Total Revenue",
+              value: `₮${totalRevenue.toLocaleString("mn-MN")}`,
+              sub: "All time",
+              up: true,
+            },
             { label: t("common.orders"), value: String(orders.length), sub: "All time", up: true },
-            { label: "Pending / Cancelled", value: `${pendingCount} / ${cancelledCount}`, sub: "Need attention", up: false },
+            {
+              label: "Pending / Cancelled",
+              value: `${pendingCount} / ${cancelledCount}`,
+              sub: "Need attention",
+              up: false,
+            },
           ].map((card) => (
             <div key={card.label} className="bg-card rounded-2xl border border-border p-5">
               <p className="text-xs text-muted-foreground">{card.label}</p>
               <p className="text-3xl font-display mt-3">{card.value}</p>
-              <span className={`text-xs font-medium flex items-center gap-0.5 mt-1 ${card.up ? "text-brand" : "text-amber-500"}`}>
-                {card.up ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}{card.sub}
+              <span
+                className={`text-xs font-medium flex items-center gap-0.5 mt-1 ${card.up ? "text-brand" : "text-amber-500"}`}
+              >
+                {card.up ? (
+                  <ArrowUpRight className="h-3 w-3" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" />
+                )}
+                {card.sub}
               </span>
             </div>
           ))}
@@ -202,12 +291,21 @@ function DashboardSection() {
               </linearGradient>
             </defs>
             <path d={areaPath} fill="url(#adminGrad)" opacity={0.4} />
-            <path d={linePath} fill="none" stroke="#0EA5E9" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d={linePath}
+              fill="none"
+              stroke="#0EA5E9"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
       </div>
       <div className="bg-card rounded-2xl border border-border overflow-hidden">
-        <div className="p-5"><h3 className="font-display text-lg">{t("admin.recentOrders")}</h3></div>
+        <div className="p-5">
+          <h3 className="font-display text-lg">{t("admin.recentOrders")}</h3>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -220,17 +318,29 @@ function DashboardSection() {
               </tr>
             </thead>
             <tbody>
-              {orders.slice(0, 5).length === 0
-                ? <tr><td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">{t("admin.noOrders")}</td></tr>
-                : orders.slice(0, 5).map((o) => (
+              {orders.slice(0, 5).length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-5 py-8 text-center text-muted-foreground">
+                    {t("admin.noOrders")}
+                  </td>
+                </tr>
+              ) : (
+                orders.slice(0, 5).map((o) => (
                   <tr key={o.id} className="border-t border-border hover:bg-muted/40">
                     <td className="px-5 py-3.5 font-medium">#{String(o.id).padStart(5, "0")}</td>
                     <td className="px-5 py-3.5 text-muted-foreground">{o.userEmail ?? "—"}</td>
-                    <td className="px-5 py-3.5 text-muted-foreground">{o.orderDate ? new Date(o.orderDate).toLocaleDateString() : "—"}</td>
-                    <td className="px-5 py-3.5"><StatusBadge status={o.status} /></td>
-                    <td className="px-5 py-3.5 text-right font-display">₮{o.totalAmount.toLocaleString("mn-MN")}</td>
+                    <td className="px-5 py-3.5 text-muted-foreground">
+                      {o.orderDate ? new Date(o.orderDate).toLocaleDateString() : "—"}
+                    </td>
+                    <td className="px-5 py-3.5">
+                      <StatusBadge status={o.status} />
+                    </td>
+                    <td className="px-5 py-3.5 text-right font-display">
+                      ₮{o.totalAmount.toLocaleString("mn-MN")}
+                    </td>
                   </tr>
-                ))}
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -242,9 +352,19 @@ function DashboardSection() {
 function OrdersSection() {
   const { t } = useTranslation();
   const qc = useQueryClient();
-  const { data: orders = [], isLoading, isError, error } = useQuery({ queryKey: ["admin-orders"], queryFn: () => getAllOrders() });
+  const {
+    data: orders = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({ queryKey: ["admin-orders"], queryFn: () => getAllOrders() });
   const handleStatus = async (id: number, status: string) => {
-    await updateOrderStatus({ data: { id, status: status as "confirmed" | "processing" | "shipped" | "delivered" | "cancelled" } });
+    await updateOrderStatus({
+      data: {
+        id,
+        status: status as "confirmed" | "processing" | "shipped" | "delivered" | "cancelled",
+      },
+    });
     qc.invalidateQueries({ queryKey: ["admin-orders"] });
     toast.success(t("admin.updated"));
   };
@@ -252,7 +372,9 @@ function OrdersSection() {
     <div className="bg-card rounded-2xl border border-border overflow-hidden">
       <div className="p-5">
         <h3 className="font-display text-lg">{t("admin.allOrders")}</h3>
-        <p className="text-sm text-muted-foreground">{orders.length} {t("admin.totalLabel")}</p>
+        <p className="text-sm text-muted-foreground">
+          {orders.length} {t("admin.totalLabel")}
+        </p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -268,9 +390,27 @@ function OrdersSection() {
             </tr>
           </thead>
           <tbody>
-            {isLoading && <tr><td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">{t("common.loading")}</td></tr>}
-            {isError && <tr><td colSpan={7} className="px-5 py-8 text-center text-red-500">{error instanceof Error ? error.message : "Failed to load orders"}</td></tr>}
-            {!isLoading && !isError && orders.length === 0 && <tr><td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">{t("admin.noOrders")}</td></tr>}
+            {isLoading && (
+              <tr>
+                <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
+                  {t("common.loading")}
+                </td>
+              </tr>
+            )}
+            {isError && (
+              <tr>
+                <td colSpan={7} className="px-5 py-8 text-center text-red-500">
+                  {error instanceof Error ? error.message : "Failed to load orders"}
+                </td>
+              </tr>
+            )}
+            {!isLoading && !isError && orders.length === 0 && (
+              <tr>
+                <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
+                  {t("admin.noOrders")}
+                </td>
+              </tr>
+            )}
             {orders.map((o) => (
               <tr key={o.id} className="border-t border-border hover:bg-muted/40">
                 <td className="px-5 py-3.5 font-medium">#{String(o.id).padStart(5, "0")}</td>
@@ -278,17 +418,29 @@ function OrdersSection() {
                   <p className="font-medium">{o.userName ?? t("admin.guest")}</p>
                   <p className="text-xs text-muted-foreground">{o.userEmail}</p>
                 </td>
-                <td className="px-5 py-3.5 text-muted-foreground">{o.orderDate ? new Date(o.orderDate).toLocaleDateString() : "—"}</td>
-                <td className="px-5 py-3.5 text-muted-foreground capitalize">{o.paymentMethod ?? "card"}</td>
-                <td className="px-5 py-3.5"><StatusBadge status={o.status} /></td>
-                <td className="px-5 py-3.5 text-right font-display">₮{o.totalAmount.toLocaleString("mn-MN")}</td>
+                <td className="px-5 py-3.5 text-muted-foreground">
+                  {o.orderDate ? new Date(o.orderDate).toLocaleDateString() : "—"}
+                </td>
+                <td className="px-5 py-3.5 text-muted-foreground capitalize">
+                  {o.paymentMethod ?? "card"}
+                </td>
+                <td className="px-5 py-3.5">
+                  <StatusBadge status={o.status} />
+                </td>
+                <td className="px-5 py-3.5 text-right font-display">
+                  ₮{o.totalAmount.toLocaleString("mn-MN")}
+                </td>
                 <td className="px-5 py-3.5">
                   <select
                     value={o.status}
                     onChange={(e) => handleStatus(o.id, e.target.value)}
                     className="text-xs h-8 px-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-1 focus:ring-brand"
                   >
-                    {ORDER_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+                    {ORDER_STATUSES.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
                   </select>
                 </td>
               </tr>
@@ -302,12 +454,17 @@ function OrdersSection() {
 
 function CustomersSection() {
   const { t } = useTranslation();
-  const { data: customers = [], isLoading } = useQuery({ queryKey: ["admin-customers"], queryFn: () => getAllUsers() });
+  const { data: customers = [], isLoading } = useQuery({
+    queryKey: ["admin-customers"],
+    queryFn: () => getAllUsers(),
+  });
   return (
     <div className="bg-card rounded-2xl border border-border overflow-hidden">
       <div className="p-5">
         <h3 className="font-display text-lg">{t("common.customers")}</h3>
-        <p className="text-sm text-muted-foreground">{customers.length} {t("admin.totalLabel")}</p>
+        <p className="text-sm text-muted-foreground">
+          {customers.length} {t("admin.totalLabel")}
+        </p>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -322,9 +479,19 @@ function CustomersSection() {
             </tr>
           </thead>
           <tbody>
-            {isLoading && <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">{t("common.loading")}</td></tr>}
+            {isLoading && (
+              <tr>
+                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                  {t("common.loading")}
+                </td>
+              </tr>
+            )}
             {!isLoading && customers.length === 0 && (
-              <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">{t("admin.noCustomers")}</td></tr>
+              <tr>
+                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                  {t("admin.noCustomers")}
+                </td>
+              </tr>
             )}
             {customers.map((c) => (
               <tr key={c.id} className="border-t border-border hover:bg-muted/40">
@@ -337,11 +504,17 @@ function CustomersSection() {
                   </div>
                 </td>
                 <td className="px-5 py-3.5 text-muted-foreground">{c.email}</td>
-                <td className="px-5 py-3.5 text-muted-foreground">{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}</td>
+                <td className="px-5 py-3.5 text-muted-foreground">
+                  {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : "—"}
+                </td>
                 <td className="px-5 py-3.5">{c.orderCount ?? 0}</td>
-                <td className="px-5 py-3.5 text-right font-display">₮{Number(c.totalSpent ?? 0).toLocaleString("mn-MN")}</td>
+                <td className="px-5 py-3.5 text-right font-display">
+                  ₮{Number(c.totalSpent ?? 0).toLocaleString("mn-MN")}
+                </td>
                 <td className="px-5 py-3.5">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${c.isAdmin ? "bg-brand/10 text-brand" : "bg-muted text-muted-foreground"}`}>
+                  <span
+                    className={`text-xs px-2.5 py-1 rounded-full font-medium ${c.isAdmin ? "bg-brand/10 text-brand" : "bg-muted text-muted-foreground"}`}
+                  >
                     {c.isAdmin ? t("common.admin") : t("common.customers")}
                   </span>
                 </td>
@@ -410,7 +583,9 @@ function productToForm(p: Record<string, unknown>): ProductFormData {
     try {
       const parsed = JSON.parse(p.imageUrls as string) as string[];
       imageUrls = parsed.filter((u) => u.startsWith("http"));
-    } catch {}
+    } catch {
+      // ignore invalid JSON
+    }
   }
   if (imageUrls.length === 0 && p.imageUrl && (p.imageUrl as string).startsWith("http")) {
     imageUrls = [p.imageUrl as string];
@@ -521,7 +696,7 @@ function ProductForm({
             className={inputCls}
             value={form.name}
             onChange={set("name")}
-            placeholder="AirStep Glide 1"
+            placeholder="AIT Shop Glide 1"
           />
         </FormField>
         <FormField label={t("common.category")}>
@@ -727,7 +902,10 @@ function AddProductSection({ onDone }: { onDone: () => void }) {
 function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
-  const { data: prods = [], isLoading } = useQuery({ queryKey: ["admin-products"], queryFn: () => getProducts() });
+  const { data: prods = [], isLoading } = useQuery({
+    queryKey: ["admin-products"],
+    queryFn: () => getProducts(),
+  });
   const [editId, setEditId] = useState<number | null>(null);
   const [editSaving, setEditSaving] = useState(false);
   const [search, setSearch] = useState("");
@@ -749,7 +927,9 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
       qc.invalidateQueries({ queryKey: ["admin-products"] });
       qc.invalidateQueries({ queryKey: ["admin-stats"] });
       if (result.errors.length > 0) {
-        toast.error(`Imported ${result.inserted}, ${result.errors.length} row(s) skipped — see console`);
+        toast.error(
+          `Imported ${result.inserted}, ${result.errors.length} row(s) skipped — see console`,
+        );
         console.error("Import errors:", result.errors);
       } else {
         toast.success(`Imported ${result.inserted} products`);
@@ -763,7 +943,9 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
   };
 
   const filtered = prods.filter(
-    (p) => p.name.toLowerCase().includes(search.toLowerCase()) || (p.category ?? "").toLowerCase().includes(search.toLowerCase())
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      (p.category ?? "").toLowerCase().includes(search.toLowerCase()),
   );
 
   const handleDelete = async (id: number, name: string) => {
@@ -810,7 +992,9 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
       <div className="p-5 flex flex-col sm:flex-row sm:items-center gap-3">
         <div>
           <h3 className="font-display text-lg">{t("admin.productList")}</h3>
-          <p className="text-sm text-muted-foreground">{prods.length} {t("common.products")}</p>
+          <p className="text-sm text-muted-foreground">
+            {prods.length} {t("common.products")}
+          </p>
         </div>
         <div className="sm:ml-auto flex gap-2">
           <div className="relative">
@@ -837,7 +1021,10 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
               disabled={importing}
             />
           </label>
-          <button onClick={onAddNew} className="h-9 px-4 rounded-full bg-brand text-brand-foreground text-sm font-medium hover:bg-brand-deep flex items-center gap-1.5">
+          <button
+            onClick={onAddNew}
+            className="h-9 px-4 rounded-full bg-brand text-brand-foreground text-sm font-medium hover:bg-brand-deep flex items-center gap-1.5"
+          >
             <Plus className="h-3.5 w-3.5" /> {t("admin.addProduct")}
           </button>
         </div>
@@ -855,44 +1042,78 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
             </tr>
           </thead>
           <tbody>
-            {isLoading && <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">{t("admin.loadingProducts")}</td></tr>}
+            {isLoading && (
+              <tr>
+                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                  {t("admin.loadingProducts")}
+                </td>
+              </tr>
+            )}
             {!isLoading && filtered.length === 0 && (
-              <tr><td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
-                {search ? t("admin.noMatch") : t("admin.noProducts")}
-              </td></tr>
+              <tr>
+                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                  {search ? t("admin.noMatch") : t("admin.noProducts")}
+                </td>
+              </tr>
             )}
             {filtered.map((p) => (
               <tr key={p.id} className="border-t border-border hover:bg-muted/40">
                 <td className="px-5 py-3.5">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 rounded-lg bg-muted grid place-items-center shrink-0">
-                      {p.imageUrl && !/^[1-6]$/.test(p.imageUrl.trim())
-                        ? <img src={p.imageUrl} alt={p.name} className="h-full w-full object-contain p-1" />
-                        : <Package className="h-5 w-5 text-muted-foreground" />}
+                      {p.imageUrl && !/^[1-6]$/.test(p.imageUrl.trim()) ? (
+                        <img
+                          src={p.imageUrl}
+                          alt={p.name}
+                          className="h-full w-full object-contain p-1"
+                        />
+                      ) : (
+                        <Package className="h-5 w-5 text-muted-foreground" />
+                      )}
                     </div>
                     <div className="min-w-0">
                       <p className="font-medium truncate max-w-[180px]">{p.name}</p>
-                      {p.badge && <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand/10 text-brand font-medium">{p.badge}</span>}
+                      {p.badge && (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-brand/10 text-brand font-medium">
+                          {p.badge}
+                        </span>
+                      )}
                     </div>
                   </div>
                 </td>
                 <td className="px-5 py-3.5 text-muted-foreground">{p.category ?? "—"}</td>
                 <td className="px-5 py-3.5">
                   <span className="font-display">₮{Number(p.price).toLocaleString("mn-MN")}</span>
-                  {p.oldPrice && <span className="ml-1.5 text-xs text-muted-foreground line-through">₮{Number(p.oldPrice).toLocaleString("mn-MN")}</span>}
+                  {p.oldPrice && (
+                    <span className="ml-1.5 text-xs text-muted-foreground line-through">
+                      ₮{Number(p.oldPrice).toLocaleString("mn-MN")}
+                    </span>
+                  )}
                 </td>
                 <td className="px-5 py-3.5">
-                  <span className={`font-medium ${p.stock === 0 ? "text-red-500" : p.stock < 10 ? "text-amber-500" : "text-emerald-600"}`}>
+                  <span
+                    className={`font-medium ${p.stock === 0 ? "text-red-500" : p.stock < 10 ? "text-amber-500" : "text-emerald-600"}`}
+                  >
                     {p.stock}
                   </span>
                 </td>
-                <td className="px-5 py-3.5 text-muted-foreground">⭐ {p.rating?.toFixed(1) ?? "—"}</td>
+                <td className="px-5 py-3.5 text-muted-foreground">
+                  ⭐ {p.rating?.toFixed(1) ?? "—"}
+                </td>
                 <td className="px-5 py-3.5">
                   <div className="flex items-center gap-2">
-                    <button onClick={() => setEditId(p.id)} className="p-1.5 rounded-lg hover:bg-brand/10 text-brand" title="Edit">
+                    <button
+                      onClick={() => setEditId(p.id)}
+                      className="p-1.5 rounded-lg hover:bg-brand/10 text-brand"
+                      title="Edit"
+                    >
                       <Edit className="h-3.5 w-3.5" />
                     </button>
-                    <button onClick={() => handleDelete(p.id, p.name)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500" title="Delete">
+                    <button
+                      onClick={() => handleDelete(p.id, p.name)}
+                      className="p-1.5 rounded-lg hover:bg-red-50 text-red-500"
+                      title="Delete"
+                    >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>
@@ -968,8 +1189,12 @@ function AdminPage() {
       {activeSection === "dashboard" && <DashboardSection />}
       {activeSection === "orders" && <OrdersSection />}
       {activeSection === "customers" && <CustomersSection />}
-      {activeSection === "products" && <ProductsSection onAddNew={() => setActiveSection("add-product")} />}
-      {activeSection === "add-product" && <AddProductSection onDone={() => setActiveSection("products")} />}
+      {activeSection === "products" && (
+        <ProductsSection onAddNew={() => setActiveSection("add-product")} />
+      )}
+      {activeSection === "add-product" && (
+        <AddProductSection onDone={() => setActiveSection("products")} />
+      )}
     </AdminLayout>
   );
 }

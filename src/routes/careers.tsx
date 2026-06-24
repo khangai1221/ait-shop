@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/careers")({
-  head: () => ({ meta: [{ title: "Careers — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Careers — AIT Shop" }] }),
   component: Careers,
 });
 

@@ -24,7 +24,7 @@ export type Product = {
 const IMAGES = [shoe1, shoe2, shoe3, shoe4, shoe5, shoe6];
 
 const NAMES = [
-  "AirStep Glide 1",
+  "AIT Shop Glide 1",
   "Velocity Runner",
   "Court Master 23",
   "Urban Drift",

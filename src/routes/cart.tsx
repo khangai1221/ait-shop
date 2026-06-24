@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/language";
 import { formatPrice } from "@/lib/format-price";
 
 export const Route = createFileRoute("/cart")({
-  head: () => ({ meta: [{ title: "Cart — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Cart — AIT Shop" }] }),
   component: CartPage,
 });
 
@@ -21,7 +21,7 @@ function CartPage() {
   const total = cartTotal + shipping - discount;
 
   const applyPromo = () => {
-    if (promo.trim().toUpperCase() === "AIRSTEP10") setDiscount(cartTotal * 0.1);
+    if (promo.trim().toUpperCase() === "AITSHOP10") setDiscount(cartTotal * 0.1);
   };
 
   if (cart.length === 0) {

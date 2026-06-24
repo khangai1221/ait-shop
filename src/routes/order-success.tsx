@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/order-success")({
   validateSearch: z.object({ orderId: z.number().optional() }),
-  head: () => ({ meta: [{ title: "Order confirmed — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Order confirmed — AIT Shop" }] }),
   component: Success,
 });
 

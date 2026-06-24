@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/login")({
   validateSearch: z.object({ mode: z.enum(["login", "register"]).optional() }),
-  head: () => ({ meta: [{ title: "Sign in — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Sign in — AIT Shop" }] }),
   component: Login,
 });
 
@@ -18,9 +18,9 @@ function Login() {
     <div className="min-h-[80vh] grid lg:grid-cols-2">
       <div className="hidden lg:block relative bg-gradient-to-br from-[#3FBAEB] to-[#1B8FCB] overflow-hidden">
         <h2 className="absolute top-20 left-12 font-display text-white text-7xl">
-          JOIN
+          AIT
           <br />
-          AIRSTEP
+          SHOP
         </h2>
         <p className="absolute bottom-12 left-12 right-12 text-white/80 max-w-sm">
           {t("login.memberPerks")}

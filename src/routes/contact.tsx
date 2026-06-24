@@ -3,7 +3,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "Contact us — AirStep" }] }),
+   head: () => ({ meta: [{ title: "Contact us — AIT Shop" }] }),
   component: Contact,
 });
 
@@ -27,7 +27,7 @@ function Contact() {
 
       <div className="grid lg:grid-cols-3 gap-6 mb-12">
         {[
-          { Icon: Mail, label: t("common.email"), val: "hello@airstep.com" },
+          { Icon: Mail, label: t("common.email"), val: "contact@aitshop.com" },
           { Icon: Phone, label: t("common.phone"), val: "+1 (555) 123-4567" },
           { Icon: MapPin, label: t("contact.flagship"), val: "120 Market St, San Francisco" },
         ].map(({ Icon, label, val }) => (
