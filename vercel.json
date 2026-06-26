@@ -3,6 +3,24 @@
   "framework": null,
   "headers": [
     {
+      "source": "/_build/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
@@ -31,7 +49,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://soeoluptfhyaopjuqbjr.supabase.co https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev https://img.clerk.com; connect-src 'self' https://soeoluptfhyaopjuqbjr.supabase.co https://*.clerk.accounts.dev wss://*.clerk.accounts.dev https://api.clerk.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://soeoluptfhyaopjuqbjr.supabase.co https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev https://img.clerk.com https://*.google.com https://*.googleapis.com https://*.gstatic.com; connect-src 'self' https://soeoluptfhyaopjuqbjr.supabase.co https://*.clerk.accounts.dev wss://*.clerk.accounts.dev https://api.clerk.com; frame-src https://www.google.com; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'"
         }
       ]
     }

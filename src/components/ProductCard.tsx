@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/mock-data";
@@ -6,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { useLanguage } from "@/lib/language";
 import { formatPrice } from "@/lib/format-price";
 
-export function ProductCard({ product }: { product: Product }) {
+function ProductCardInner({ product }: { product: Product }) {
   const { t } = useTranslation();
   const { language } = useLanguage();
   const { addToCart, toggleWishlist, wishlist } = useStore();
@@ -104,3 +105,5 @@ export function ProductCard({ product }: { product: Product }) {
     </div>
   );
 }
+
+export const ProductCard = memo(ProductCardInner);

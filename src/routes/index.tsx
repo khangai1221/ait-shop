@@ -53,9 +53,34 @@ function Home() {
 
   if (isPending || !heroProduct) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="h-8 w-8 rounded-full border-2 border-brand border-t-transparent animate-spin" />
-      </div>
+      <>
+        {/* Hero skeleton */}
+        <div className="bg-gradient-to-br from-[#3FBAEB] via-[#2DA9E0] to-[#1B8FCB] animate-pulse">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-24 grid lg:grid-cols-2 gap-8 items-center">
+            <div className="order-2 lg:order-1 h-[320px] sm:h-[400px] lg:h-[500px] rounded-2xl bg-white/20" />
+            <div className="order-1 lg:order-2 space-y-4">
+              <div className="h-6 w-24 rounded-full bg-white/20" />
+              <div className="h-12 w-3/4 rounded-xl bg-white/20" />
+              <div className="h-4 w-1/2 rounded-lg bg-white/20" />
+              <div className="h-12 w-40 rounded-full bg-white/20 mt-6" />
+            </div>
+          </div>
+        </div>
+        {/* Product grid skeleton */}
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+          <div className="h-8 w-48 rounded-xl bg-muted animate-pulse mb-8" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="space-y-3 animate-pulse">
+                <div className="aspect-square rounded-2xl bg-muted" />
+                <div className="h-3 w-1/2 rounded bg-muted" />
+                <div className="h-4 w-3/4 rounded bg-muted" />
+                <div className="h-4 w-1/3 rounded bg-muted" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
     );
   }
 
@@ -70,6 +95,8 @@ function Home() {
               alt={heroProduct.name}
               width={1024}
               height={768}
+              fetchPriority="high"
+              loading="eager"
               className="relative drop-shadow-2xl -rotate-6 hover:rotate-0 transition-transform duration-700 w-full h-auto max-h-[320px] sm:max-h-[400px] lg:max-h-[500px] object-contain"
             />
             <div className="relative mt-4 sm:mt-6 flex gap-3 overflow-x-auto pb-2 snap-x scrollbar-hide">
