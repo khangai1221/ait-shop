@@ -269,12 +269,7 @@ function ProductPage() {
           </div>
 
           <div className="mt-5 sm:mt-6">
-            {outOfStock ? (
-              <span className="inline-flex items-center gap-1.5 text-sm font-medium text-red-500">
-                <span className="h-2 w-2 rounded-full bg-red-500" />
-                {t("common.outOfStock")}
-              </span>
-            ) : lowStock ? (
+            {lowStock && !outOfStock ? (
               <span className="inline-flex items-center gap-1.5 text-sm font-medium text-amber-500">
                 <span className="h-2 w-2 rounded-full bg-amber-500" />
                 {t("common.onlyLeft", { count: product.stock })}

@@ -23,17 +23,29 @@ import {
   LogIn,
   Upload,
   FileUp,
+  BarChart2,
+  Download,
+  RefreshCw,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react";
 import {
   getAdminProducts,
   createProduct,
   updateProduct,
   deleteProduct,
+  deleteAllProducts,
   getAdminStats,
   uploadProductImage,
 } from "@/lib/api/products";
 import { ImportProducts } from "@/components/admin/ImportProducts";
-import { getAllOrders, updateOrderStatus } from "@/lib/api/orders";
+import {
+  getAllOrders,
+  updateOrderStatus,
+  getSalesStats,
+  exportOrdersCsv,
+  deleteAllOrders,
+} from "@/lib/api/orders";
 import { getAllUsers, checkAdminAccess } from "@/lib/api/users";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -45,6 +57,7 @@ export const Route = createFileRoute("/admin")({
 
 type Section =
   | "dashboard"
+  | "analytics"
   | "products"
   | "add-product"
   | "import-products"
@@ -100,6 +113,7 @@ function AdminLayout({
 
   const NAV: { id: Section; label: string; Icon: React.ElementType }[] = [
     { id: "dashboard", label: t("admin.dashboard"), Icon: LayoutDashboard },
+    { id: "analytics", label: "Analytics", Icon: BarChart2 },
     { id: "orders", label: t("common.orders"), Icon: ShoppingCart },
     { id: "customers", label: t("common.customers"), Icon: Users },
     { id: "products", label: t("admin.productList"), Icon: List },
@@ -351,6 +365,241 @@ function DashboardSection() {
           </table>
         </div>
       </div>
+    </div>
+  );
+}
+
+function AnalyticsSection() {
+  const qc = useQueryClient();
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ["sales-stats"],
+    queryFn: () => getSalesStats(),
+  });
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
+  const fmt = (n: number) => `₮${n.toLocaleString("mn-MN")}`;
+
+  const pct = (current: number, prev: number) => {
+    if (prev === 0) return current > 0 ? 100 : 0;
+    return Math.round(((current - prev) / prev) * 100);
+  };
+
+  const handleExport = async () => {
+    const csv = await exportOrdersCsv();
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `ait-shop-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleReset = async () => {
+    setResetting(true);
+    try {
+      await deleteAllOrders();
+      qc.invalidateQueries({ queryKey: ["sales-stats"] });
+      qc.invalidateQueries({ queryKey: ["admin-orders"] });
+      toast.success("All order data has been reset.");
+      setConfirmReset(false);
+    } catch {
+      toast.error("Reset failed.");
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  const daily = stats?.dailyRevenue ?? [];
+  const maxRev = Math.max(...daily.map((d) => d.revenue), 1);
+  const H = 120;
+  const W = 100;
+  const step = daily.length > 1 ? W / (daily.length - 1) : W;
+  const linePath = daily
+    .map((d, i) => `${i === 0 ? "M" : "L"} ${i * step} ${H - (d.revenue / maxRev) * H}`)
+    .join(" ");
+  const areaPath =
+    daily.length > 0 ? `${linePath} L ${(daily.length - 1) * step} ${H} L 0 ${H} Z` : "";
+
+  const periods = [
+    { label: "Today", data: stats?.today },
+    { label: "This Week", data: stats?.thisWeek, compare: stats?.lastWeek },
+    { label: "Last Week", data: stats?.lastWeek },
+    { label: "This Month", data: stats?.thisMonth, compare: stats?.lastMonth },
+    { label: "Last Month", data: stats?.lastMonth },
+    { label: "All Time", data: stats?.allTime },
+  ] as const;
+
+  return (
+    <div className="space-y-6">
+      {/* Header actions */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-display text-2xl">Sales Analytics</h2>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Revenue and order breakdown by period
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExport}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-border bg-card text-sm font-medium hover:bg-muted transition"
+          >
+            <Download className="h-4 w-4" /> Export CSV
+          </button>
+          <button
+            onClick={() => setConfirmReset(true)}
+            className="inline-flex items-center gap-2 h-10 px-4 rounded-xl border border-red-200 bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 transition"
+          >
+            <RefreshCw className="h-4 w-4" /> Reset Stats
+          </button>
+        </div>
+      </div>
+
+      {/* Period cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="bg-card rounded-2xl border border-border p-4 animate-pulse h-24"
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {periods.map(({ label, data, compare }) => {
+            const change = compare !== undefined ? pct(data?.revenue ?? 0, compare.revenue) : null;
+            return (
+              <div key={label} className="bg-card rounded-2xl border border-border p-4">
+                <p className="text-xs text-muted-foreground">{label}</p>
+                <p className="text-xl font-display mt-1 truncate">{fmt(data?.revenue ?? 0)}</p>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-xs text-muted-foreground">{data?.orders ?? 0} orders</span>
+                  {change !== null && (
+                    <span
+                      className={`text-xs font-medium flex items-center gap-0.5 ${change >= 0 ? "text-emerald-600" : "text-red-500"}`}
+                    >
+                      {change >= 0 ? (
+                        <TrendingUp className="h-3 w-3" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3" />
+                      )}
+                      {Math.abs(change)}% vs prior
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Revenue chart — last 30 days */}
+      <div className="bg-card rounded-2xl border border-border p-5">
+        <p className="text-sm font-medium mb-1">Daily Revenue — Last 30 Days</p>
+        <p className="text-xs text-muted-foreground mb-4">Excludes cancelled orders</p>
+        {daily.length > 0 ? (
+          <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-40" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="analyticsGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#0EA5E9" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#0EA5E9" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {areaPath && <path d={areaPath} fill="url(#analyticsGrad)" />}
+            {linePath && (
+              <path
+                d={linePath}
+                fill="none"
+                stroke="#0EA5E9"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+          </svg>
+        ) : (
+          <div className="h-40 flex items-center justify-center text-muted-foreground text-sm">
+            No data yet
+          </div>
+        )}
+        <div className="flex justify-between text-[10px] text-muted-foreground mt-2">
+          <span>{daily[0]?.date ?? ""}</span>
+          <span>{daily[daily.length - 1]?.date ?? ""}</span>
+        </div>
+      </div>
+
+      {/* Top products */}
+      <div className="bg-card rounded-2xl border border-border overflow-hidden">
+        <div className="p-5 border-b border-border">
+          <h3 className="font-display text-lg">Top Products by Revenue</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            All time, excluding cancelled orders
+          </p>
+        </div>
+        {isLoading ? (
+          <div className="p-5 animate-pulse space-y-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="h-8 bg-muted rounded-lg" />
+            ))}
+          </div>
+        ) : !stats?.topProducts?.length ? (
+          <p className="p-5 text-sm text-muted-foreground">No sales data yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border text-muted-foreground text-xs">
+                  <th className="px-5 py-3 text-left font-medium">#</th>
+                  <th className="px-5 py-3 text-left font-medium">Product</th>
+                  <th className="px-5 py-3 text-right font-medium">Units Sold</th>
+                  <th className="px-5 py-3 text-right font-medium">Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {stats.topProducts.map((p, idx) => (
+                  <tr key={p.name} className="border-t border-border hover:bg-muted/40">
+                    <td className="px-5 py-3 text-muted-foreground font-medium">{idx + 1}</td>
+                    <td className="px-5 py-3 font-medium">{p.name}</td>
+                    <td className="px-5 py-3 text-right text-muted-foreground">{p.quantity}</td>
+                    <td className="px-5 py-3 text-right font-display">{fmt(p.revenue)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Reset confirmation modal */}
+      {confirmReset && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-card rounded-2xl border border-border p-6 w-full max-w-sm shadow-2xl">
+            <h3 className="font-display text-lg text-red-600">Reset All Order Data?</h3>
+            <p className="text-sm text-muted-foreground mt-2">
+              This will permanently delete <strong>all orders and order items</strong> from the
+              database. This action cannot be undone.
+            </p>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setConfirmReset(false)}
+                className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReset}
+                disabled={resetting}
+                className="flex-1 h-10 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition disabled:opacity-50"
+              >
+                {resetting ? "Deleting…" : "Yes, Reset"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -930,6 +1179,14 @@ function ProductsSection({ onAddNew, onImport }: { onAddNew: () => void; onImpor
     toast.success(t("admin.deleted"));
   };
 
+  const handleDeleteAll = async () => {
+    if (!confirm(`Delete all ${prods.length} products? This cannot be undone.`)) return;
+    await deleteAllProducts();
+    qc.invalidateQueries({ queryKey: ["admin-products"] });
+    qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    toast.success("All products deleted.");
+  };
+
   const handleEditSave = async (form: ProductFormData) => {
     if (!editId) return;
     setEditSaving(true);
@@ -991,6 +1248,13 @@ function ProductsSection({ onAddNew, onImport }: { onAddNew: () => void; onImpor
             className="h-9 px-4 rounded-full bg-brand text-brand-foreground text-sm font-medium hover:bg-brand-deep flex items-center gap-1.5"
           >
             <Plus className="h-3.5 w-3.5" /> {t("admin.addProduct")}
+          </button>
+          <button
+            onClick={handleDeleteAll}
+            disabled={prods.length === 0}
+            className="h-9 px-4 rounded-full border border-red-200 bg-red-50 text-red-600 text-sm font-medium hover:bg-red-100 flex items-center gap-1.5 transition disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Delete All
           </button>
         </div>
       </div>
@@ -1175,6 +1439,7 @@ function AdminPage() {
   return (
     <AdminLayout activeSection={activeSection} setActiveSection={setActiveSection}>
       {activeSection === "dashboard" && <DashboardSection />}
+      {activeSection === "analytics" && <AnalyticsSection />}
       {activeSection === "orders" && <OrdersSection />}
       {activeSection === "customers" && <CustomersSection />}
       {activeSection === "products" && (

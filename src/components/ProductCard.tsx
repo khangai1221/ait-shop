@@ -38,16 +38,11 @@ export function ProductCard({ product }: { product: Product }) {
             {product.badge}
           </span>
         )}
-        {outOfStock && (
-          <span className="absolute top-3 left-3 z-10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider rounded-full bg-red-500 text-white">
-            {t("common.outOfStock")}
-          </span>
-        )}
         <img
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className={`absolute inset-0 h-full w-full object-contain p-3 sm:p-4 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6 ${outOfStock ? "opacity-50" : ""}`}
+          className="absolute inset-0 h-full w-full object-contain p-3 sm:p-4 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6"
         />
         <button
           onClick={handleToggleWishlist}

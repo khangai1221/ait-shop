@@ -3,7 +3,7 @@ import { z } from "zod";
 import { createClerkClient, verifyToken } from "@clerk/backend";
 import { db, ensureReady } from "../db";
 import { orders, orderItems, users } from "../db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, ne } from "drizzle-orm";
 import { requireAdmin, requireAuth, checkRateLimit, sanitize } from "../server-auth";
 import { getCookie } from "@tanstack/react-start/server";
 
@@ -138,6 +138,136 @@ export const createOrder = createServerFn({ method: "POST" })
 
     return order;
   });
+
+// ── Sales analytics ───────────────────────────────────────────────────────────
+
+export const getSalesStats = createServerFn({ method: "GET" }).handler(async () => {
+  await requireAdmin();
+  await ensureReady();
+
+  const now = new Date();
+
+  const startOf = (d: Date) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+
+  const todayStart = startOf(now);
+
+  const weekDay = now.getDay(); // 0=Sun
+  const diffToMon = weekDay === 0 ? -6 : 1 - weekDay;
+  const thisWeekStart = startOf(now);
+  thisWeekStart.setDate(now.getDate() + diffToMon);
+
+  const lastWeekStart = new Date(thisWeekStart);
+  lastWeekStart.setDate(lastWeekStart.getDate() - 7);
+
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd  = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const allOrders = await db
+    .select({ id: orders.id, orderDate: orders.orderDate, totalAmount: orders.totalAmount, status: orders.status })
+    .from(orders)
+    .where(ne(orders.status, "cancelled"))
+    .orderBy(desc(orders.orderDate));
+
+  const inPeriod = (start: Date, end?: Date) =>
+    allOrders.filter((o) => {
+      const d = new Date(o.orderDate);
+      return d >= start && (!end || d < end);
+    });
+
+  const sum = (list: typeof allOrders) => list.reduce((s, o) => s + o.totalAmount, 0);
+
+  const todayList     = inPeriod(todayStart);
+  const thisWeekList  = inPeriod(thisWeekStart);
+  const lastWeekList  = inPeriod(lastWeekStart, thisWeekStart);
+  const thisMonthList = inPeriod(thisMonthStart);
+  const lastMonthList = inPeriod(lastMonthStart, lastMonthEnd);
+
+  // Daily revenue — last 30 days
+  const dailyRevenue: { date: string; revenue: number; orderCount: number }[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const dayStart = startOf(new Date(now));
+    dayStart.setDate(now.getDate() - i);
+    const dayEnd = new Date(dayStart);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    const dayList = inPeriod(dayStart, dayEnd);
+    dailyRevenue.push({ date: dayStart.toISOString().slice(0, 10), revenue: sum(dayList), orderCount: dayList.length });
+  }
+
+  // Top products by revenue (non-cancelled orders only)
+  const itemRows = await db
+    .select({ productName: orderItems.productName, quantity: orderItems.quantity, unitPrice: orderItems.unitPrice })
+    .from(orderItems)
+    .innerJoin(orders, eq(orderItems.orderId, orders.id))
+    .where(ne(orders.status, "cancelled"));
+
+  const productMap = new Map<string, { revenue: number; quantity: number }>();
+  for (const item of itemRows) {
+    const e = productMap.get(item.productName) ?? { revenue: 0, quantity: 0 };
+    productMap.set(item.productName, { revenue: e.revenue + item.unitPrice * item.quantity, quantity: e.quantity + item.quantity });
+  }
+  const topProducts = [...productMap.entries()]
+    .map(([name, d]) => ({ name, ...d }))
+    .sort((a, b) => b.revenue - a.revenue)
+    .slice(0, 10);
+
+  return {
+    today:     { revenue: sum(todayList),     orders: todayList.length },
+    thisWeek:  { revenue: sum(thisWeekList),  orders: thisWeekList.length },
+    lastWeek:  { revenue: sum(lastWeekList),  orders: lastWeekList.length },
+    thisMonth: { revenue: sum(thisMonthList), orders: thisMonthList.length },
+    lastMonth: { revenue: sum(lastMonthList), orders: lastMonthList.length },
+    allTime:   { revenue: sum(allOrders),     orders: allOrders.length },
+    dailyRevenue,
+    topProducts,
+  };
+});
+
+export const exportOrdersCsv = createServerFn({ method: "GET" }).handler(async () => {
+  await requireAdmin();
+  await ensureReady();
+
+  const rows = await db
+    .select({
+      id: orders.id,
+      orderDate: orders.orderDate,
+      totalAmount: orders.totalAmount,
+      status: orders.status,
+      paymentMethod: orders.paymentMethod,
+      shippingAddress: orders.shippingAddress,
+      userEmail: users.email,
+      userName: users.displayName,
+    })
+    .from(orders)
+    .leftJoin(users, eq(orders.userId, users.id))
+    .orderBy(desc(orders.orderDate));
+
+  const esc = (v: string | null | undefined) => `"${(v ?? "").replace(/"/g, '""')}"`;
+
+  const header = "Order ID,Customer,Email,Date,Amount (₮),Status,Payment,Shipping Address";
+  const lines = rows.map((r) =>
+    [
+      r.id,
+      esc(r.userName),
+      esc(r.userEmail),
+      new Date(r.orderDate).toISOString(),
+      r.totalAmount,
+      r.status,
+      r.paymentMethod ?? "",
+      esc(r.shippingAddress),
+    ].join(","),
+  );
+
+  return [header, ...lines].join("\n");
+});
+
+export const deleteAllOrders = createServerFn({ method: "POST" }).handler(async () => {
+  await requireAdmin();
+  await ensureReady();
+  await db.delete(orderItems);
+  await db.delete(orders);
+  return { success: true };
+});
 
 const VALID_STATUSES = ["confirmed", "processing", "shipped", "delivered", "cancelled"] as const;
 

@@ -57,283 +57,6 @@ export const uploadProductImage = createServerFn({ method: "POST" })
     return { url: publicUrl };
   });
 
-const SEED_PRODUCTS = [
-  {
-    name: "AIT Shop Glide 1",
-    price: 302600,
-    oldPrice: 438600,
-    stock: 42,
-    category: "Running",
-    badge: "New",
-    imageUrl: "1",
-    colors: '["#3B82F6","#0EA5E9","#10B981"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.8,
-    description:
-      "Engineered for everyday performance. Breathable mesh upper, responsive cushioning, and a durable rubber outsole built to keep up with your stride — from city blocks to weekend trails.",
-  },
-  {
-    name: "Velocity Runner",
-    price: 346800,
-    stock: 31,
-    category: "Running",
-    imageUrl: "2",
-    colors: '["#111827","#EF4444","#3B82F6"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.5,
-    description:
-      "Built for speed. A lightweight frame with precision cushioning lets you push your pace without sacrificing comfort over long distances.",
-  },
-  {
-    name: "Court Master 23",
-    price: 391000,
-    stock: 18,
-    category: "Basketball",
-    badge: "New",
-    imageUrl: "3",
-    colors: '["#F59E0B","#111827","#EF4444"]',
-    sizes: "[39,40,41,42,43,44,45]",
-    rating: 4.7,
-    description:
-      "Dominate the court with superior ankle support, court-gripping outsole, and impact-absorbing foam. Designed with pro athletes in mind.",
-  },
-  {
-    name: "Urban Drift",
-    price: 435200,
-    stock: 25,
-    category: "Lifestyle",
-    imageUrl: "4",
-    colors: '["#10B981","#FFFFFF","#3B82F6"]',
-    sizes: "[38,39,40,41,42,43,44]",
-    rating: 4.3,
-    description:
-      "Where street style meets everyday comfort. Clean silhouette, premium materials, and a cushioned footbed that keeps you fresh from morning to night.",
-  },
-  {
-    name: "Trail Blazer Pro",
-    price: 479400,
-    oldPrice: 615400,
-    stock: 14,
-    category: "Running",
-    badge: "-30%",
-    imageUrl: "5",
-    colors: '["#0EA5E9","#F59E0B","#10B981"]',
-    sizes: "[39,40,41,42,43,44,45]",
-    rating: 4.6,
-    description:
-      "Conquer off-road terrain with a rugged grip outsole and waterproof upper. This trail shoe handles everything from muddy paths to rocky climbs.",
-  },
-  {
-    name: "Cloud Walk 270",
-    price: 523600,
-    stock: 37,
-    category: "Lifestyle",
-    imageUrl: "6",
-    colors: '["#EF4444","#FFFFFF","#111827"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.9,
-    description:
-      "Step into cloud-like comfort. The 270° air unit and plush foam midsole deliver an unmatched cushioning experience for all-day wear.",
-  },
-  {
-    name: "Street Icon Low",
-    price: 567800,
-    stock: 22,
-    category: "Sneakers",
-    imageUrl: "1",
-    colors: '["#FFFFFF","#3B82F6","#F59E0B"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.4,
-    description:
-      "A classic silhouette reimagined for modern streets. Premium leather-look upper with a retro-inspired sole that pairs with anything in your wardrobe.",
-  },
-  {
-    name: "Boost Trainer X",
-    price: 612000,
-    stock: 9,
-    category: "Training",
-    imageUrl: "2",
-    colors: '["#111827","#EF4444","#0EA5E9"]',
-    sizes: "[39,40,41,42,43,44,45]",
-    rating: 4.6,
-    description:
-      "Engineered for the gym and beyond. Energy-return foam, a lockdown fit, and multi-directional traction make this the ultimate cross-trainer.",
-  },
-  {
-    name: "Heritage Court 6",
-    price: 302600,
-    oldPrice: 404600,
-    stock: 28,
-    category: "Basketball",
-    badge: "Sale",
-    imageUrl: "3",
-    colors: '["#3B82F6","#10B981","#EF4444"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.2,
-    description:
-      "A retro court icon brought back in premium colorways. Lightweight canvas upper with a vulcanized sole that's as stylish as it is durable.",
-  },
-  {
-    name: "Phantom Run",
-    price: 346800,
-    stock: 16,
-    category: "Running",
-    imageUrl: "4",
-    colors: '["#F59E0B","#FFFFFF","#111827"]',
-    sizes: "[39,40,41,42,43,44,45]",
-    rating: 4.5,
-    description:
-      "A ghost on the track. Ultra-lightweight construction with a zero-drop profile for natural running mechanics and minimal ground feel.",
-  },
-  {
-    name: "Vapor Lite",
-    price: 391000,
-    stock: 33,
-    category: "Training",
-    imageUrl: "5",
-    colors: '["#10B981","#3B82F6","#F59E0B"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.3,
-    description:
-      "Feather-light and flexible, the Vapor Lite moves with you through every workout. Breathable mesh keeps feet cool when intensity climbs.",
-  },
-  {
-    name: "Studio Flex",
-    price: 435200,
-    stock: 20,
-    category: "Training",
-    badge: "New",
-    imageUrl: "6",
-    colors: '["#EF4444","#0EA5E9","#FFFFFF"]',
-    sizes: "[38,39,40,41,42,43,44]",
-    rating: 4.7,
-    description:
-      "Designed for studio sessions and beyond. The flexible split-sole construction provides superior grip for yoga, Pilates, and dance workouts.",
-  },
-  {
-    name: "Hyper Pulse",
-    price: 479400,
-    stock: 7,
-    category: "Running",
-    imageUrl: "1",
-    colors: '["#FFFFFF","#EF4444","#10B981"]',
-    sizes: "[39,40,41,42,43,44,45]",
-    rating: 4.8,
-    description:
-      "Feel the pulse of every step. Carbon-fiber plate technology and nitrogen-injected foam create an explosive energy return for race day performance.",
-  },
-  {
-    name: "Apex Field",
-    price: 523600,
-    oldPrice: 659600,
-    stock: 11,
-    category: "Training",
-    badge: "-20%",
-    imageUrl: "2",
-    colors: '["#3B82F6","#111827","#0EA5E9"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.4,
-    description:
-      "From turf to track, the Apex Field delivers. Multi-surface traction and a reinforced toe box make this the go-to choice for field athletes.",
-  },
-  {
-    name: "Echo Lifestyle",
-    price: 567800,
-    stock: 45,
-    category: "Lifestyle",
-    imageUrl: "3",
-    colors: '["#F59E0B","#3B82F6","#EF4444"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.1,
-    description:
-      "Make a statement with every stride. Bold colorways and an oversized sole unit put the Echo Lifestyle at the forefront of sneaker culture.",
-  },
-  {
-    name: "Summit Hike",
-    price: 612000,
-    stock: 19,
-    category: "Running",
-    imageUrl: "4",
-    colors: '["#10B981","#F59E0B","#FFFFFF"]',
-    sizes: "[39,40,41,42,43,44,45]",
-    rating: 4.6,
-    description:
-      "Built for those who go the distance. A waterproof membrane, aggressive lug pattern, and ankle collar support tackle the toughest mountain trails.",
-  },
-  {
-    name: "Pace Setter 90",
-    price: 302600,
-    oldPrice: 438600,
-    stock: 26,
-    category: "Running",
-    badge: "-30%",
-    imageUrl: "5",
-    colors: '["#0EA5E9","#111827","#3B82F6"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.3,
-    description:
-      "A throwback runner updated with modern comfort tech. Retro design lines meet contemporary foam cushioning in this timeless performance shoe.",
-  },
-  {
-    name: "Glow Court",
-    price: 346800,
-    stock: 38,
-    category: "Basketball",
-    imageUrl: "6",
-    colors: '["#FFFFFF","#10B981","#F59E0B"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.5,
-    description:
-      "Light up the court in the Glow Court. Reflective detailing and a high-visibility colorway combine with locked-down support for standout play.",
-  },
-  {
-    name: "Drift Mid",
-    price: 391000,
-    stock: 21,
-    category: "Sneakers",
-    imageUrl: "1",
-    colors: '["#EF4444","#3B82F6","#111827"]',
-    sizes: "[39,40,41,42,43,44,45]",
-    rating: 4.2,
-    description:
-      "The mid-top silhouette reimagined for the streets. Extended ankle collar, premium nubuck, and a cupsole construction built to last.",
-  },
-  {
-    name: "Origin White",
-    price: 435200,
-    stock: 15,
-    category: "Sneakers",
-    imageUrl: "2",
-    colors: '["#FFFFFF","#FFFFFF","#FFFFFF"]',
-    sizes: "[38,39,40,41,42,43,44,45]",
-    rating: 4.9,
-    description:
-      "Pure. Clean. Iconic. The Origin White strips everything back to essentials — a pristine white leather upper and minimal branding for a timeless look.",
-  },
-];
-
-async function ensureSeeded() {
-  await ensureReady();
-  const existing = await db.select({ id: products.id }).from(products).limit(1);
-  if (existing.length === 0) {
-    await db.insert(products).values(
-      SEED_PRODUCTS.map((p) => ({
-        name: p.name,
-        price: p.price,
-        oldPrice: "oldPrice" in p ? (p.oldPrice ?? null) : null,
-        stock: p.stock,
-        description: p.description ?? null,
-        imageUrl: p.imageUrl ?? null,
-        category: p.category ?? null,
-        badge: p.badge ?? null,
-        colors: p.colors ?? null,
-        sizes: p.sizes ?? null,
-        rating: p.rating ?? null,
-      })),
-    );
-  }
-}
-
 // Public columns — buyingPrice is intentionally omitted
 const PUBLIC_PRODUCT_COLUMNS = {
   id: products.id,
@@ -356,45 +79,16 @@ const PUBLIC_PRODUCT_COLUMNS = {
 
 export const getProducts = createServerFn({ method: "GET" }).handler(async () => {
   checkRateLimit(`products:${clientIP()}`, 60, 60_000);
-  try {
-    await ensureSeeded();
-    return db
-      .select(PUBLIC_PRODUCT_COLUMNS)
-      .from(products)
-      .orderBy(desc(products.createdAt));
-  } catch (err) {
-    console.error("DB unavailable, returning seed data:", err);
-    return SEED_PRODUCTS.map((p, idx) => ({
-      id: idx + 1,
-      name: p.name,
-      price: p.price,
-      oldPrice: p.oldPrice ?? null,
-      stock: p.stock,
-      description: p.description ?? null,
-      imageUrl: p.imageUrl ?? null,
-      imageUrls: null,
-      category: p.category ?? null,
-      badge: p.badge ?? null,
-      colors: p.colors ?? null,
-      sizes: p.sizes ?? null,
-      rating: p.rating ?? null,
-      slug: null,
-      status: "published",
-      createdAt: new Date(),
-    }));
-  }
+  return db
+    .select(PUBLIC_PRODUCT_COLUMNS)
+    .from(products)
+    .orderBy(desc(products.createdAt));
 });
 
 // Admin-only: includes buyingPrice, status, slug
 export const getAdminProducts = createServerFn({ method: "GET" }).handler(async () => {
   await requireAdmin();
-  try {
-    await ensureSeeded();
-    return db.select().from(products).orderBy(desc(products.createdAt));
-  } catch (err) {
-    console.error("DB unavailable:", err);
-    return [];
-  }
+  return db.select().from(products).orderBy(desc(products.createdAt));
 });
 
 export const getProductById = createServerFn({ method: "POST" })
@@ -475,6 +169,12 @@ export const deleteProduct = createServerFn({ method: "POST" })
     await db.delete(products).where(eq(products.id, data.id));
     return { success: true };
   });
+
+export const deleteAllProducts = createServerFn({ method: "POST" }).handler(async () => {
+  await requireAdmin();
+  await db.delete(products);
+  return { success: true };
+});
 
 // ── Bulk import from Excel (.xlsx) or Word (.docx) ───────────────────────────
 
