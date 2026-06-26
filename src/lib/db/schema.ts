@@ -1,4 +1,13 @@
-import { pgTable, text, integer, boolean, timestamp, serial, doublePrecision } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  integer,
+  boolean,
+  timestamp,
+  serial,
+  doublePrecision,
+  unique,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -16,6 +25,8 @@ export const products = pgTable("products", {
   name: text("name").notNull(),
   price: doublePrecision("price").notNull(),
   oldPrice: doublePrecision("old_price"),
+  // Admin-only: never returned from the public API
+  buyingPrice: doublePrecision("buying_price"),
   stock: integer("stock").notNull().default(0),
   description: text("description"),
   imageUrl: text("image_url"),
@@ -25,26 +36,51 @@ export const products = pgTable("products", {
   colors: text("colors"),
   sizes: text("sizes"),
   rating: doublePrecision("rating").default(4.0),
+  slug: text("slug"),
+  status: text("status").notNull().default("published"), // 'draft' | 'published'
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }),
 });
+
+// Normalised size records created for every imported product
+export const productSizes = pgTable(
+  "product_sizes",
+  {
+    id: serial("id").primaryKey(),
+    productId: integer("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    size: text("size").notNull(),
+    available: boolean("available").notNull().default(true),
+  },
+  (table) => [unique().on(table.productId, table.size)],
+);
 
 export const carts = pgTable("carts", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }),
 });
 
 export const cartItems = pgTable("cart_items", {
   id: serial("id").primaryKey(),
-  cartId: integer("cart_id").notNull().references(() => carts.id, { onDelete: "cascade" }),
-  productId: integer("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  cartId: integer("cart_id")
+    .notNull()
+    .references(() => carts.id, { onDelete: "cascade" }),
+  productId: integer("product_id")
+    .notNull()
+    .references(() => products.id, { onDelete: "cascade" }),
   quantity: integer("quantity").notNull(),
 });
 
 export const orders = pgTable("orders", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
   orderDate: timestamp("order_date", { withTimezone: true }).notNull().defaultNow(),
   totalAmount: doublePrecision("total_amount").notNull(),
   status: text("status").notNull().default("confirmed"),
@@ -55,7 +91,9 @@ export const orders = pgTable("orders", {
 
 export const orderItems = pgTable("order_items", {
   id: serial("id").primaryKey(),
-  orderId: integer("order_id").notNull().references(() => orders.id, { onDelete: "cascade" }),
+  orderId: integer("order_id")
+    .notNull()
+    .references(() => orders.id, { onDelete: "cascade" }),
   productId: integer("product_id"),
   productName: text("product_name").notNull(),
   quantity: integer("quantity").notNull(),

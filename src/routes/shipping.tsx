@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage, InfoSection } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/shipping")({
-   head: () => ({ meta: [{ title: "Shipping & Delivery — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Shipping & Delivery — AIT Shop" }] }),
   component: Shipping,
 });
 
@@ -16,7 +16,11 @@ function Shipping() {
     { Icon: Store, title: t("shippingPage.pickupTitle"), desc: t("shippingPage.pickupDesc") },
   ];
   return (
-    <InfoPage tag={t("shippingPage.tag")} title={t("shippingPage.title")} description={t("shippingPage.desc")}>
+    <InfoPage
+      tag={t("shippingPage.tag")}
+      title={t("shippingPage.title")}
+      description={t("shippingPage.desc")}
+    >
       {METHODS.map(({ Icon, title, desc }) => (
         <InfoSection key={title} title={title}>
           <p className="flex items-start gap-3">

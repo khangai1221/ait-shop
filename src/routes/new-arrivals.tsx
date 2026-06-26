@@ -7,7 +7,7 @@ import { ProductGrid } from "@/components/ProductGrid";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/new-arrivals")({
-   head: () => ({ meta: [{ title: "New Arrivals — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "New Arrivals — AIT Shop" }] }),
   component: NewArrivals,
 });
 

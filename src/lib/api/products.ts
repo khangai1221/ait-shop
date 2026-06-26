@@ -3,9 +3,10 @@ import { z } from "zod";
 import { db, ensureReady } from "../db";
 import { products } from "../db/schema";
 import { eq, desc } from "drizzle-orm";
-import { requireAdmin, sanitize, checkRateLimit } from "../server-auth";
+import { requireAdmin, sanitize, checkRateLimit, clientIP } from "../server-auth";
 
-const SUPABASE_URL = "https://soeoluptfhyaopjuqbjr.supabase.co";
+const SUPABASE_URL =
+  process.env.SUPABASE_URL ?? "https://soeoluptfhyaopjuqbjr.supabase.co";
 const BUCKET = "products";
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8MB
@@ -333,10 +334,34 @@ async function ensureSeeded() {
   }
 }
 
+// Public columns — buyingPrice is intentionally omitted
+const PUBLIC_PRODUCT_COLUMNS = {
+  id: products.id,
+  name: products.name,
+  price: products.price,
+  oldPrice: products.oldPrice,
+  stock: products.stock,
+  description: products.description,
+  imageUrl: products.imageUrl,
+  imageUrls: products.imageUrls,
+  category: products.category,
+  badge: products.badge,
+  colors: products.colors,
+  sizes: products.sizes,
+  rating: products.rating,
+  slug: products.slug,
+  status: products.status,
+  createdAt: products.createdAt,
+} as const;
+
 export const getProducts = createServerFn({ method: "GET" }).handler(async () => {
+  checkRateLimit(`products:${clientIP()}`, 60, 60_000);
   try {
     await ensureSeeded();
-    return db.select().from(products).orderBy(desc(products.createdAt));
+    return db
+      .select(PUBLIC_PRODUCT_COLUMNS)
+      .from(products)
+      .orderBy(desc(products.createdAt));
   } catch (err) {
     console.error("DB unavailable, returning seed data:", err);
     return SEED_PRODUCTS.map((p, idx) => ({
@@ -353,16 +378,34 @@ export const getProducts = createServerFn({ method: "GET" }).handler(async () =>
       colors: p.colors ?? null,
       sizes: p.sizes ?? null,
       rating: p.rating ?? null,
+      slug: null,
+      status: "published",
       createdAt: new Date(),
     }));
+  }
+});
+
+// Admin-only: includes buyingPrice, status, slug
+export const getAdminProducts = createServerFn({ method: "GET" }).handler(async () => {
+  await requireAdmin();
+  try {
+    await ensureSeeded();
+    return db.select().from(products).orderBy(desc(products.createdAt));
+  } catch (err) {
+    console.error("DB unavailable:", err);
+    return [];
   }
 });
 
 export const getProductById = createServerFn({ method: "POST" })
   .validator(z.object({ id: z.number() }))
   .handler(async ({ data }) => {
+    checkRateLimit(`product:${clientIP()}`, 120, 60_000);
     await ensureReady();
-    const [product] = await db.select().from(products).where(eq(products.id, data.id));
+    const [product] = await db
+      .select(PUBLIC_PRODUCT_COLUMNS)
+      .from(products)
+      .where(eq(products.id, data.id));
     return product ?? null;
   });
 
@@ -486,7 +529,8 @@ async function parseDocxRows(buffer: Buffer): Promise<Record<string, unknown>[]>
 export const importProducts = createServerFn({ method: "POST" })
   .validator(
     z.object({
-      fileBase64: z.string(),
+      // ~7.5 MB raw file maximum (base64 inflates ~33%)
+      fileBase64: z.string().max(10 * 1024 * 1024),
       fileType: z.enum(["xlsx", "docx"]),
     }),
   )

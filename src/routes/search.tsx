@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/search")({
   validateSearch: z.object({ q: z.string().optional() }),
-   head: () => ({ meta: [{ title: "Search — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Search — AIT Shop" }] }),
   component: SearchPage,
 });
 

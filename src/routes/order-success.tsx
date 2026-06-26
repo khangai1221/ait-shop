@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/order-success")({
   validateSearch: z.object({ orderId: z.number().optional() }),
-   head: () => ({ meta: [{ title: "Order confirmed — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Order confirmed — AIT Shop" }] }),
   component: Success,
 });
 
@@ -19,9 +19,7 @@ function Success() {
         <CheckCircle2 className="h-10 w-10 text-brand" />
       </div>
       <h1 className="font-display text-4xl mt-6">{t("orderSuccess.title")}</h1>
-      <p className="text-muted-foreground mt-3">
-        {t("orderSuccess.desc", { id: orderNumber })}
-      </p>
+      <p className="text-muted-foreground mt-3">{t("orderSuccess.desc", { id: orderNumber })}</p>
       <div className="mt-8 rounded-2xl border border-border p-6 text-left bg-card">
         <h2 className="font-display text-lg mb-3">{t("orderSuccess.whatsNext")}</h2>
         <ul className="text-sm text-muted-foreground space-y-2">

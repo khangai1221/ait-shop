@@ -25,13 +25,10 @@ interface Bucket {
 
 const rlStore = new Map<string, Bucket>();
 
-setInterval(
-  () => {
-    const now = Date.now();
-    for (const [k, v] of rlStore) if (v.resetAt < now) rlStore.delete(k);
-  },
-  5 * 60_000,
-);
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of rlStore) if (v.resetAt < now) rlStore.delete(k);
+}, 5 * 60_000);
 
 export function checkRateLimit(key: string, limit: number, windowMs: number): void {
   const now = Date.now();
@@ -60,7 +57,10 @@ export function clientIP(): string {
 // ── Input sanitization ────────────────────────────────────────────────────────
 
 export function sanitize(value: string, maxLen = 500): string {
-  return value.replace(/<[^>]*>/g, "").trim().slice(0, maxLen);
+  return value
+    .replace(/<[^>]*>/g, "")
+    .trim()
+    .slice(0, maxLen);
 }
 
 // ── Auth helpers ──────────────────────────────────────────────────────────────
@@ -112,7 +112,9 @@ export async function requireAdmin(): Promise<{ userId: string }> {
     const clerkUser = await clerk.users.getUser(userId);
     const primaryEmail =
       clerkUser.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
-        ?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress ?? "";
+        ?.emailAddress ??
+      clerkUser.emailAddresses[0]?.emailAddress ??
+      "";
     if (adminEmails.includes(primaryEmail.toLowerCase())) return { userId };
   }
 

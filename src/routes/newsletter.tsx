@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/newsletter")({
-   head: () => ({ meta: [{ title: "Newsletter — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Newsletter — AIT Shop" }] }),
   component: Newsletter,
 });
 
@@ -22,7 +22,11 @@ function Newsletter() {
   };
 
   return (
-    <InfoPage tag={t("newsletter.tag")} title={t("newsletter.title")} description={t("newsletter.desc")}>
+    <InfoPage
+      tag={t("newsletter.tag")}
+      title={t("newsletter.title")}
+      description={t("newsletter.desc")}
+    >
       <form
         onSubmit={submit}
         className="rounded-2xl border border-border p-6 sm:p-8 bg-card flex flex-col sm:flex-row gap-3"

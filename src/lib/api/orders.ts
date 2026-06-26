@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createClerkClient } from "@clerk/backend";
+import { createClerkClient, verifyToken } from "@clerk/backend";
 import { db, ensureReady } from "../db";
 import { orders, orderItems, users } from "../db/schema";
 import { eq, desc } from "drizzle-orm";
@@ -87,12 +87,29 @@ export const createOrder = createServerFn({ method: "POST" })
     const sessionCookie = getCookie("__session") ?? getCookie("__client_uat") ?? "anon";
     checkRateLimit(`order:${sessionCookie.slice(-16)}`, 5, 60_000);
 
-    let [user] = await db.select().from(users).where(eq(users.email, data.email));
+    // For authenticated users, override the client-supplied email with the
+    // Clerk-verified address so an authenticated user can't place orders under
+    // a different account's email.
+    let email = data.email;
+    const sessionToken = getCookie("__session");
+    if (sessionToken && process.env.CLERK_SECRET_KEY) {
+      try {
+        const claims = await verifyToken(sessionToken, {
+          secretKey: process.env.CLERK_SECRET_KEY,
+        });
+        const clerkEmail = await getAuthenticatedEmail(claims.sub);
+        if (clerkEmail) email = clerkEmail;
+      } catch {
+        // Invalid / expired session — fall through to guest checkout
+      }
+    }
+
+    let [user] = await db.select().from(users).where(eq(users.email, email));
     if (!user) {
       [user] = await db
         .insert(users)
         .values({
-          email: data.email,
+          email,
           displayName: data.displayName ? sanitize(data.displayName) : null,
         })
         .returning();

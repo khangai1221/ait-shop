@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/login")({
   validateSearch: z.object({ mode: z.enum(["login", "register"]).optional() }),
-   head: () => ({ meta: [{ title: "Sign in — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Sign in — AIT Shop" }] }),
   component: Login,
 });
 

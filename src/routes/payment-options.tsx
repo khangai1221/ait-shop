@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage, InfoSection } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/payment-options")({
-   head: () => ({ meta: [{ title: "Payment options — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Payment options — AIT Shop" }] }),
   component: PaymentOptions,
 });
 
@@ -15,7 +15,11 @@ function PaymentOptions() {
     { Icon: Store, title: t("paymentPage.pickupTitle"), desc: t("paymentPage.pickupDesc") },
   ];
   return (
-    <InfoPage tag={t("paymentPage.tag")} title={t("paymentPage.title")} description={t("paymentPage.desc")}>
+    <InfoPage
+      tag={t("paymentPage.tag")}
+      title={t("paymentPage.title")}
+      description={t("paymentPage.desc")}
+    >
       {METHODS.map(({ Icon, title, desc }) => (
         <InfoSection key={title} title={title}>
           <p className="flex items-start gap-3">

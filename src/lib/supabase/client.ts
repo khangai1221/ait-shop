@@ -1,7 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import { getServerConfig } from "../config.server";
 
-const url = "https://soeoluptfhyaopjuqbjr.supabase.co";
+function getUrl() {
+  return process.env.SUPABASE_URL ?? "https://soeoluptfhyaopjuqbjr.supabase.co";
+}
 
 export function getSupabaseClient() {
   const config = getServerConfig();
@@ -11,7 +13,7 @@ export function getSupabaseClient() {
     throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
   }
 
-  return createClient(url, serviceRoleKey, {
+  return createClient(getUrl(), serviceRoleKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -20,8 +22,9 @@ export function getSupabaseClient() {
 }
 
 export function getBrowserSupabaseClient() {
-  const anonPublic =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNvZW9sdXB0Zmh5YW9wanVxYmpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNzQzNDMsImV4cCI6MjA5Njc1MDM0M30.4vejRopNIWkbwPxx1V2bdMfg91aJ9ysr80rh-J8eA5I";
-
-  return createClient(url, anonPublic);
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
+  if (!anonKey) {
+    throw new Error("Missing VITE_SUPABASE_ANON_KEY");
+  }
+  return createClient(getUrl(), anonKey);
 }

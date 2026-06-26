@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/returns")({
-   head: () => ({ meta: [{ title: "Returns — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Returns — AIT Shop" }] }),
   component: Returns,
 });
 
@@ -15,7 +15,11 @@ function Returns() {
     [t("returnsPage.step3Title"), t("returnsPage.step3Desc")],
   ];
   return (
-    <InfoPage tag={t("returnsPage.tag")} title={t("returnsPage.title")} description={t("returnsPage.desc")}>
+    <InfoPage
+      tag={t("returnsPage.tag")}
+      title={t("returnsPage.title")}
+      description={t("returnsPage.desc")}
+    >
       <ol className="space-y-4">
         {STEPS.map(([title, desc]) => (
           <li key={title} className="rounded-2xl border border-border p-6 sm:p-8 bg-card">

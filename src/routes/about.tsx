@@ -4,7 +4,7 @@ import shoe2 from "@/assets/shoe-6.png";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/about")({
-   head: () => ({ meta: [{ title: "About — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "About — AIT Shop" }] }),
   component: About,
 });
 
@@ -29,7 +29,9 @@ function About() {
       <section className="bg-gradient-to-br from-[#3FBAEB] to-[#1B8FCB] text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 lg:py-28 grid lg:grid-cols-2 gap-10 items-center">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-white/80">{t("about.storyTag")}</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-white/80">
+              {t("about.storyTag")}
+            </p>
             <h1 className="font-display text-5xl lg:text-7xl mt-3 leading-[0.95]">
               {t("about.headline")}
             </h1>

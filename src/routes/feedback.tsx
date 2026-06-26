@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import { InfoPage } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/feedback")({
-   head: () => ({ meta: [{ title: "Site feedback — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Site feedback — AIT Shop" }] }),
   component: Feedback,
 });
 
@@ -22,7 +22,10 @@ function Feedback() {
 
   return (
     <InfoPage tag={t("feedback.tag")} title={t("feedback.title")} description={t("feedback.desc")}>
-      <form onSubmit={submit} className="rounded-2xl border border-border p-6 sm:p-8 bg-card space-y-4">
+      <form
+        onSubmit={submit}
+        className="rounded-2xl border border-border p-6 sm:p-8 bg-card space-y-4"
+      >
         <label className="block">
           <span className="text-xs uppercase tracking-wider text-muted-foreground">
             {t("feedback.label")}

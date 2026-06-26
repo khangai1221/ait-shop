@@ -6,7 +6,7 @@ export function getDb() {
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error(
-      "DATABASE_URL is not set. Go to Supabase → Project Settings → Database → Connection string (Transaction pooler) and add it to your .env and Vercel environment variables."
+      "DATABASE_URL is not set. Go to Supabase → Project Settings → Database → Connection string (Transaction pooler) and add it to your .env and Vercel environment variables.",
     );
   }
   const client = postgres(url, { prepare: false });

@@ -113,7 +113,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
-      { rel: "icon", type: "image/jpeg", href: "https://scontent.fsin15-2.fna.fbcdn.net/v/t1.15752-9/467483286_956491719731551_4684893202213182403_n.jpg?stp=dst-jpg_p120x120_tt6&_nc_cat=107&ccb=1-7&_nc_sid=029a7d&_nc_ohc=hdYyXLdJg-EQ7kNvwEK2IVz&_nc_oc=AdqXyO-rUBV5QmW2BY_jnP_uZwLqFp2qa75XzaedJ1ES6twbO72uqB7WS_0wXcqNBVs&_nc_zt=23&_nc_ht=scontent.fsin15-2.fna&_nc_ss=7b2a8&oh=03_Q7cD5gGGvJm47O7iJFKBdjxV7m1FvdkcnTZjp_uVpF-G3-2idw&oe=6A5945C7" },
+      {
+        rel: "icon",
+        type: "image/svg+xml",
+        href: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230EA5E9'/><text x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='18' font-weight='900' fill='white'>A</text></svg>",
+      },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
@@ -133,15 +137,15 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <I18nProvider>
       <LanguageProvider>
-      <html lang="en">
-        <head>
-          <HeadContent />
-        </head>
-        <body>
-          {children}
-          <Scripts />
-        </body>
-      </html>
+        <html lang="en">
+          <head>
+            <HeadContent />
+          </head>
+          <body>
+            {children}
+            <Scripts />
+          </body>
+        </html>
       </LanguageProvider>
     </I18nProvider>
   );

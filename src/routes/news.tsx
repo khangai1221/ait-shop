@@ -4,12 +4,16 @@ import { useTranslation } from "react-i18next";
 import { InfoPage } from "@/components/InfoPage";
 
 export const Route = createFileRoute("/news")({
-   head: () => ({ meta: [{ title: "News — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "News — AIT Shop" }] }),
   component: News,
 });
 
 // Add news items here as they happen — newest first. Each item needs both languages.
-const NEWS_ITEMS: { date: string; title: { en: string; mn: string }; body: { en: string; mn: string } }[] = [];
+const NEWS_ITEMS: {
+  date: string;
+  title: { en: string; mn: string };
+  body: { en: string; mn: string };
+}[] = [];
 
 function News() {
   const { t, i18n } = useTranslation();
@@ -27,7 +31,9 @@ function News() {
           <article key={item.date} className="rounded-2xl border border-border p-6 sm:p-8 bg-card">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">{item.date}</p>
             <h2 className="font-display text-xl sm:text-2xl mt-1 mb-2">{item.title[lang]}</h2>
-            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{item.body[lang]}</p>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              {item.body[lang]}
+            </p>
           </article>
         ))
       )}

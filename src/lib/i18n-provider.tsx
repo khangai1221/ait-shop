@@ -315,14 +315,16 @@ const resources = {
       about: {
         storyTag: "Our story",
         headline: "Built for the next step.",
-        intro: "AIT Shop started in 2017 with one idea: sneakers should feel as good as they look. From a tiny garage in Portland to a global community of runners, ballers, and creatives, we've kept that promise.",
+        intro:
+          "AIT Shop started in 2017 with one idea: sneakers should feel as good as they look. From a tiny garage in Portland to a global community of runners, ballers, and creatives, we've kept that promise.",
         statPairs: "Pairs sold",
         statCountries: "Countries shipped",
         statPartners: "Retail partners",
         statHappy: "Happy customers",
         missionTag: "Mission",
         missionHeading: "Move more. Move better.",
-        missionDesc: "Every pair we ship is designed to help you move with confidence — whether that's a marathon, a morning walk, or a midnight skate. We believe movement is a universal language and we're here to make it more accessible, more sustainable, and a whole lot more fun.",
+        missionDesc:
+          "Every pair we ship is designed to help you move with confidence — whether that's a marathon, a morning walk, or a midnight skate. We believe movement is a universal language and we're here to make it more accessible, more sustainable, and a whole lot more fun.",
         valuesHeading: "What we stand for",
         craftTitle: "Craft",
         craftDesc: "Obsessed with every stitch, every seam, every step.",
@@ -338,7 +340,8 @@ const resources = {
         createAccount: "Create your account",
         signInDesc: "Sign in to your AIT Shop account",
         registerDesc: "Join the AIT Shop community today",
-        memberPerks: "Become a member to unlock exclusive drops, early access, and free shipping on every order.",
+        memberPerks:
+          "Become a member to unlock exclusive drops, early access, and free shipping on every order.",
       },
       findStore: {
         tag: "Stores",
@@ -377,7 +380,8 @@ const resources = {
         expressTitle: "Express delivery",
         expressDesc: "1–2 business days for ₮61,200.",
         pickupTitle: "In-store pickup",
-        pickupDesc: "Free. Choose pickup at checkout and collect at our Ulaanbaatar store once your order is ready.",
+        pickupDesc:
+          "Free. Choose pickup at checkout and collect at our Ulaanbaatar store once your order is ready.",
       },
       returnsPage: {
         tag: "Help",
@@ -388,7 +392,8 @@ const resources = {
         step2Title: "2. Send it back",
         step2Desc: "Items must be unworn, in original packaging, within 30 days of delivery.",
         step3Title: "3. Get refunded",
-        step3Desc: "Once we receive your return, your refund is issued to your original payment method.",
+        step3Desc:
+          "Once we receive your return, your refund is issued to your original payment method.",
       },
       paymentPage: {
         tag: "Help",
@@ -423,11 +428,13 @@ const resources = {
         title: "Sustainability",
         desc: "Small steps, taken consistently, add up.",
         materialsTitle: "Recycled materials",
-        materialsDesc: "We prioritize recycled and responsibly-sourced materials wherever the design allows it.",
+        materialsDesc:
+          "We prioritize recycled and responsibly-sourced materials wherever the design allows it.",
         factoriesTitle: "Ethical factories",
         factoriesDesc: "We work only with manufacturing partners who meet fair labor standards.",
         supplyTitle: "Transparent supply chain",
-        supplyDesc: "We're working towards full visibility into where every component of every shoe comes from.",
+        supplyDesc:
+          "We're working towards full visibility into where every component of every shoe comes from.",
       },
     },
   },
@@ -680,7 +687,8 @@ const resources = {
       newArrivals: {
         tag: "Шинэ ирлээ",
         title: "Шинэ бараа",
-        subtitle: "AIT Shop загварын лабораторийн хамгийн сүүлийн загварууд. Хамгийн түрүүн өмсөөрэй.",
+        subtitle:
+          "AIT Shop загварын лабораторийн хамгийн сүүлийн загварууд. Хамгийн түрүүн өмсөөрэй.",
       },
       contact: {
         title: "Холбоо барих",
@@ -742,14 +750,16 @@ const resources = {
       about: {
         storyTag: "Бидний түүх",
         headline: "Дараагийн алхамд зориулагдсан.",
-        intro: "AIT Shop 2017 онд нэг санаагаар эхэлсэн: гутал сайн харагдахын зэрэгцээ тав тухтай байх ёстой. Портлэндын жижиг гаражнаас дэлхийн хэмжээний гүйгчид, тоглогчид, бүтээлч хүмүүсийн нийгэмлэг болтол тэр амлалтаа биелүүлсээр ирлээ.",
+        intro:
+          "AIT Shop 2017 онд нэг санаагаар эхэлсэн: гутал сайн харагдахын зэрэгцээ тав тухтай байх ёстой. Портлэндын жижиг гаражнаас дэлхийн хэмжээний гүйгчид, тоглогчид, бүтээлч хүмүүсийн нийгэмлэг болтол тэр амлалтаа биелүүлсээр ирлээ.",
         statPairs: "Хос борлуулсан",
         statCountries: "Улс руу хүргэсэн",
         statPartners: "Худалдааны түнш",
         statHappy: "Сэтгэл ханасан хэрэглэгч",
         missionTag: "Эрхэм зорилго",
         missionHeading: "Илүү хөдөл. Илүү сайн хөдөл.",
-        missionDesc: "Бидний хүргэх гутал бүр таныг итгэлтэйгээр хөдлөхөд зориулагдсан — марафон ч бай, өглөөний алхалт ч бай, шөнийн скейт ч бай. Хөдөлгөөн бол нийтлэг хэл гэдэгт итгэдэг бөгөөд бид үүнийг илүү хүртээмжтэй, тогтвортой, хөгжилтэй болгоход оршдог.",
+        missionDesc:
+          "Бидний хүргэх гутал бүр таныг итгэлтэйгээр хөдлөхөд зориулагдсан — марафон ч бай, өглөөний алхалт ч бай, шөнийн скейт ч бай. Хөдөлгөөн бол нийтлэг хэл гэдэгт итгэдэг бөгөөд бид үүнийг илүү хүртээмжтэй, тогтвортой, хөгжилтэй болгоход оршдог.",
         valuesHeading: "Бидний үнэт зүйлс",
         craftTitle: "Гар урлал",
         craftDesc: "Оёдол, тавилт, алхам бүрт дуртайяа ажилладаг.",
@@ -775,7 +785,8 @@ const resources = {
         address: "Чингис өргөн чөлөө 120, Улаанбаатар, Монгол улс",
         hoursLabel: "Цагийн хуваарь",
         hours: "Да–Ба 10:00–20:00 · Ня 11:00–18:00",
-        pickupNote: "Захиалга хийхдээ дэлгүүрт ирж авах сонголтыг хийж, ирэхдээ төлбөрөө хийж болно.",
+        pickupNote:
+          "Захиалга хийхдээ дэлгүүрт ирж авах сонголтыг хийж, ирэхдээ төлбөрөө хийж болно.",
       },
       newsletter: {
         tag: "Мэдээлэлтэй байгаарай",
@@ -784,7 +795,8 @@ const resources = {
         placeholder: "tani@jishee.mn",
         subscribe: "Бүртгүүлэх",
         success: "Бүртгэгдлээ! Дараагийн шинэ барааг имэйлээрээ хүлээж аваарай.",
-        privacyNote: "Бид зөвхөн AIT Shop-тэй холбоотой имэйл илгээх болно. Хүссэн үедээ цуцлах боломжтой.",
+        privacyNote:
+          "Бид зөвхөн AIT Shop-тэй холбоотой имэйл илгээх болно. Хүссэн үедээ цуцлах боломжтой.",
       },
       feedback: {
         tag: "Бид сонсож байна",
@@ -800,11 +812,13 @@ const resources = {
         title: "Хүргэлт",
         desc: "Хүргэлтийн арга бүрийн хугацаа, үнийг харна уу.",
         standardTitle: "Энгийн хүргэлт",
-        standardDesc: "3–5 ажлын өдөр. ₮340,000-аас дээш захиалга үнэгүй, бусад тохиолдолд ₮40,800.",
+        standardDesc:
+          "3–5 ажлын өдөр. ₮340,000-аас дээш захиалга үнэгүй, бусад тохиолдолд ₮40,800.",
         expressTitle: "Яаралтай хүргэлт",
         expressDesc: "1–2 ажлын өдөр, ₮61,200.",
         pickupTitle: "Дэлгүүрт ирж авах",
-        pickupDesc: "Үнэгүй. Захиалга хийхдээ дэлгүүрт ирж авах сонголтыг хийж, бэлэн болсон үед Улаанбаатар дэлгүүрээс авна уу.",
+        pickupDesc:
+          "Үнэгүй. Захиалга хийхдээ дэлгүүрт ирж авах сонголтыг хийж, бэлэн болсон үед Улаанбаатар дэлгүүрээс авна уу.",
       },
       returnsPage: {
         tag: "Тусламж",
@@ -813,9 +827,11 @@ const resources = {
         step1Title: "1. Буцаалт эхлүүлэх",
         step1Desc: "Захиалгын дугаар болон буцаах бараагаа бидэнд мэдэгдээрэй.",
         step2Title: "2. Буцаах бараагаа илгээх",
-        step2Desc: "Бараа өмсөгдөөгүй, эх боодолтойгоор, хүргэгдснээс хойш 30 хоногийн дотор байх ёстой.",
+        step2Desc:
+          "Бараа өмсөгдөөгүй, эх боодолтойгоор, хүргэгдснээс хойш 30 хоногийн дотор байх ёстой.",
         step3Title: "3. Мөнгөө буцаан авах",
-        step3Desc: "Буцаасан бараа хүлээн авагдсаны дараа таны төлбөрийг эх төлбөрийн хэрэгслэлд буцаана.",
+        step3Desc:
+          "Буцаасан бараа хүлээн авагдсаны дараа таны төлбөрийг эх төлбөрийн хэрэгслэлд буцаана.",
       },
       paymentPage: {
         tag: "Тусламж",
@@ -850,11 +866,14 @@ const resources = {
         title: "Тогтвортой байдал",
         desc: "Тогтмол хийсэн жижиг алхамууд цаг хугацаанд хуримтлагддаг.",
         materialsTitle: "Дахин боловсруулсан материал",
-        materialsDesc: "Боломжтой бүх тохиолдолд дахин боловсруулсан, хариуцлагатай эх үүсвэрээс гаралтай материалыг ашигладаг.",
+        materialsDesc:
+          "Боломжтой бүх тохиолдолд дахин боловсруулсан, хариуцлагатай эх үүсвэрээс гаралтай материалыг ашигладаг.",
         factoriesTitle: "Ёс зүйтэй үйлдвэрүүд",
-        factoriesDesc: "Бид зөвхөн хөдөлмөрийн шударга стандартыг хангасан үйлдвэрлэлийн түншүүдтэй хамтран ажилладаг.",
+        factoriesDesc:
+          "Бид зөвхөн хөдөлмөрийн шударга стандартыг хангасан үйлдвэрлэлийн түншүүдтэй хамтран ажилладаг.",
         supplyTitle: "Ил тод нийлүүлэлтийн сүлжээ",
-        supplyDesc: "Гутал бүрийн эд анги хаанаас гаралтай болохыг бүрэн харагдуулахын төлөө ажиллаж байна.",
+        supplyDesc:
+          "Гутал бүрийн эд анги хаанаас гаралтай болохыг бүрэн харагдуулахын төлөө ажиллаж байна.",
       },
     },
   },

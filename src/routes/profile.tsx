@@ -11,7 +11,7 @@ export const Route = createFileRoute("/profile")({
   validateSearch: z.object({
     tab: z.enum(["profile", "orders", "addresses", "settings"]).optional(),
   }),
-   head: () => ({ meta: [{ title: "My account — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "My account — AIT Shop" }] }),
   component: Profile,
 });
 
@@ -82,7 +82,9 @@ function Profile() {
           </div>
         )}
         <div>
-          <h1 className="font-display text-3xl">{user.fullName ?? user.firstName ?? t("profile.myAccount")}</h1>
+          <h1 className="font-display text-3xl">
+            {user.fullName ?? user.firstName ?? t("profile.myAccount")}
+          </h1>
           <p className="text-sm text-muted-foreground">
             {email} · {t("profile.memberSince", { year: memberYear })}
           </p>
@@ -110,7 +112,10 @@ function Profile() {
                 <Field label={t("common.firstName")} defaultValue={user.firstName ?? ""} />
                 <Field label={t("common.lastName")} defaultValue={user.lastName ?? ""} />
                 <Field label={t("common.email")} defaultValue={email} readOnly />
-                <Field label={t("common.phone")} defaultValue={user.phoneNumbers?.[0]?.phoneNumber ?? ""} />
+                <Field
+                  label={t("common.phone")}
+                  defaultValue={user.phoneNumbers?.[0]?.phoneNumber ?? ""}
+                />
               </div>
               <p className="text-xs text-muted-foreground">{t("profile.clerkNote")}</p>
             </div>
@@ -120,7 +125,9 @@ function Profile() {
             <div>
               <h2 className="font-display text-2xl mb-5">{t("profile.orderHistory")}</h2>
               {ordersLoading ? (
-                <div className="py-10 text-center text-muted-foreground">{t("profile.loadingOrders")}</div>
+                <div className="py-10 text-center text-muted-foreground">
+                  {t("profile.loadingOrders")}
+                </div>
               ) : orders.length === 0 ? (
                 <div className="py-10 text-center">
                   <ShoppingBag className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
@@ -159,8 +166,13 @@ function Profile() {
                       {o.items && o.items.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-border space-y-1">
                           {o.items.map((item) => (
-                            <div key={item.id} className="flex justify-between text-sm text-muted-foreground">
-                              <span>{item.productName} × {item.quantity}</span>
+                            <div
+                              key={item.id}
+                              className="flex justify-between text-sm text-muted-foreground"
+                            >
+                              <span>
+                                {item.productName} × {item.quantity}
+                              </span>
                               <span>${(item.unitPrice * item.quantity).toFixed(2)}</span>
                             </div>
                           ))}
@@ -178,7 +190,9 @@ function Profile() {
               <h2 className="font-display text-2xl mb-5">{t("profile.savedAddresses")}</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 <div className="p-5 rounded-xl border border-border">
-                  <p className="text-xs uppercase tracking-wider text-brand">{t("profile.defaultLabel")}</p>
+                  <p className="text-xs uppercase tracking-wider text-brand">
+                    {t("profile.defaultLabel")}
+                  </p>
                   <p className="font-semibold mt-2">{t("profile.homeLabel")}</p>
                   <p className="text-sm text-muted-foreground">{t("profile.addressHint")}</p>
                 </div>
@@ -198,7 +212,10 @@ function Profile() {
                   [t("profile.smsAlerts"), t("profile.smsAlertsDesc")],
                   [t("profile.personalized"), t("profile.personalizedDesc")],
                 ].map(([title, sub]) => (
-                  <div key={title} className="flex justify-between items-center p-4 rounded-xl border border-border">
+                  <div
+                    key={title}
+                    className="flex justify-between items-center p-4 rounded-xl border border-border"
+                  >
                     <div>
                       <p className="font-medium">{title}</p>
                       <p className="text-xs text-muted-foreground">{sub}</p>

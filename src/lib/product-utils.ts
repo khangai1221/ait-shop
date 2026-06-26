@@ -22,7 +22,14 @@ export type DbProduct = {
   colors: string | null;
   sizes: string | null;
   rating: number | null;
+  slug?: string | null;
+  status?: string | null;
   createdAt: Date | string;
+  updatedAt?: Date | string | null;
+};
+
+export type DbProductAdmin = DbProduct & {
+  buyingPrice: number | null;
 };
 
 function resolveUrl(url: string, fallbackIndex: number): string {

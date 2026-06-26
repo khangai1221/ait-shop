@@ -1,10 +1,5 @@
-import { type ReactNode } from 'react';
-import {
-  ClerkProvider,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from '@clerk/clerk-react';
+import { type ReactNode } from "react";
+import { ClerkProvider, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -13,11 +8,7 @@ export function SafeClerkProvider({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
 
-  return (
-    <ClerkProvider publishableKey={KEY}>
-      {children}
-    </ClerkProvider>
-  );
+  return <ClerkProvider publishableKey={KEY}>{children}</ClerkProvider>;
 }
 
 export function SignedInWrapper({ children }: { children: ReactNode }) {

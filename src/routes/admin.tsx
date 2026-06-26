@@ -22,16 +22,17 @@ import {
   Shield,
   LogIn,
   Upload,
+  FileUp,
 } from "lucide-react";
 import {
-  getProducts,
+  getAdminProducts,
   createProduct,
   updateProduct,
   deleteProduct,
   getAdminStats,
   uploadProductImage,
-  importProducts,
 } from "@/lib/api/products";
+import { ImportProducts } from "@/components/admin/ImportProducts";
 import { getAllOrders, updateOrderStatus } from "@/lib/api/orders";
 import { getAllUsers, checkAdminAccess } from "@/lib/api/users";
 import { toast } from "sonner";
@@ -42,7 +43,13 @@ export const Route = createFileRoute("/admin")({
   component: AdminPage,
 });
 
-type Section = "dashboard" | "products" | "add-product" | "orders" | "customers";
+type Section =
+  | "dashboard"
+  | "products"
+  | "add-product"
+  | "import-products"
+  | "orders"
+  | "customers";
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-amber-50 text-amber-600",
@@ -97,6 +104,7 @@ function AdminLayout({
     { id: "customers", label: t("common.customers"), Icon: Users },
     { id: "products", label: t("admin.productList"), Icon: List },
     { id: "add-product", label: t("admin.addProduct"), Icon: Plus },
+    { id: "import-products", label: "Import Products", Icon: FileUp },
   ];
 
   return (
@@ -105,11 +113,9 @@ function AdminLayout({
         className={`bg-[#1A2B4C] text-white flex flex-col transition-all duration-300 shrink-0 ${collapsed ? "w-[72px]" : "w-[240px]"}`}
       >
         <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
-          <img
-            src="https://scontent.fsin15-2.fna.fbcdn.net/v/t1.15752-9/467483286_956491719731551_4684893202213182403_n.jpg?stp=dst-jpg_p120x120_tt6&_nc_cat=107&ccb=1-7&_nc_sid=029a7d&_nc_ohc=hdYyXLdJg-EQ7kNvwEK2IVz&_nc_oc=AdqXyO-rUBV5QmW2BY_jnP_uZwLqFp2qa75XzaedJ1ES6twbO72uqB7WS_0wXcqNBVs&_nc_zt=23&_nc_ht=scont65ent.fsin15-2.fna&_nc_ss=7b2a8&oh=03_Q7cD5gGGvJm47O7iJFKBdjxV7m1FvdkcnTZjp_uVpF-G3-2idw&oe=6A5945C7"
-            alt="AIT Shop logo"
-            className={`shrink-0 object-cover ${collapsed ? "h-8 w-8 rounded-lg" : "h-8 w-8 rounded-lg"}`}
-          />
+          <span className="shrink-0 h-8 w-8 rounded-lg bg-brand inline-flex items-center justify-center font-black text-white text-base select-none">
+            A
+          </span>
           {!collapsed && (
             <span className="font-display text-lg">
               AIT <span className="text-brand">SHOP</span>
@@ -899,48 +905,16 @@ function AddProductSection({ onDone }: { onDone: () => void }) {
   );
 }
 
-function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
+function ProductsSection({ onAddNew, onImport }: { onAddNew: () => void; onImport: () => void }) {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const { data: prods = [], isLoading } = useQuery({
     queryKey: ["admin-products"],
-    queryFn: () => getProducts(),
+    queryFn: () => getAdminProducts(),
   });
   const [editId, setEditId] = useState<number | null>(null);
   const [editSaving, setEditSaving] = useState(false);
   const [search, setSearch] = useState("");
-  const [importing, setImporting] = useState(false);
-
-  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const ext = file.name.split(".").pop()?.toLowerCase();
-    if (ext !== "xlsx" && ext !== "docx") {
-      toast.error("Only .xlsx or .docx files are supported");
-      e.target.value = "";
-      return;
-    }
-    setImporting(true);
-    try {
-      const fileBase64 = await fileToBase64(file);
-      const result = await importProducts({ data: { fileBase64, fileType: ext } });
-      qc.invalidateQueries({ queryKey: ["admin-products"] });
-      qc.invalidateQueries({ queryKey: ["admin-stats"] });
-      if (result.errors.length > 0) {
-        toast.error(
-          `Imported ${result.inserted}, ${result.errors.length} row(s) skipped — see console`,
-        );
-        console.error("Import errors:", result.errors);
-      } else {
-        toast.success(`Imported ${result.inserted} products`);
-      }
-    } catch {
-      toast.error("Import failed");
-    } finally {
-      setImporting(false);
-      e.target.value = "";
-    }
-  };
 
   const filtered = prods.filter(
     (p) =>
@@ -1006,21 +980,12 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
               className="h-9 pl-8 pr-3 rounded-full border border-border bg-muted/40 text-sm focus:outline-none focus:ring-2 focus:ring-brand w-44"
             />
           </div>
-          <label
-            className={`h-9 px-4 rounded-full border border-border text-sm font-medium flex items-center gap-1.5 cursor-pointer transition ${
-              importing ? "opacity-50 pointer-events-none" : "hover:bg-muted"
-            }`}
+          <button
+            onClick={onImport}
+            className="h-9 px-4 rounded-full border border-border text-sm font-medium flex items-center gap-1.5 hover:bg-muted transition"
           >
-            <Upload className="h-3.5 w-3.5" />
-            {importing ? "Importing..." : "Import (.xlsx/.docx)"}
-            <input
-              type="file"
-              accept=".xlsx,.docx"
-              className="sr-only"
-              onChange={handleImportFile}
-              disabled={importing}
-            />
-          </label>
+            <FileUp className="h-3.5 w-3.5" /> Import file
+          </button>
           <button
             onClick={onAddNew}
             className="h-9 px-4 rounded-full bg-brand text-brand-foreground text-sm font-medium hover:bg-brand-deep flex items-center gap-1.5"
@@ -1036,7 +1001,9 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
               <th className="px-5 py-3 text-left font-medium">{t("common.product")}</th>
               <th className="px-5 py-3 text-left font-medium">{t("common.category")}</th>
               <th className="px-5 py-3 text-left font-medium">{t("common.price")}</th>
+              <th className="px-5 py-3 text-left font-medium">Buying price</th>
               <th className="px-5 py-3 text-left font-medium">{t("common.stock")}</th>
+              <th className="px-5 py-3 text-left font-medium">Status</th>
               <th className="px-5 py-3 text-left font-medium">{t("common.rating")}</th>
               <th className="px-5 py-3 text-left font-medium">{t("common.actions")}</th>
             </tr>
@@ -1044,14 +1011,14 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                <td colSpan={8} className="px-5 py-8 text-center text-muted-foreground">
                   {t("admin.loadingProducts")}
                 </td>
               </tr>
             )}
             {!isLoading && filtered.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                <td colSpan={8} className="px-5 py-8 text-center text-muted-foreground">
                   {search ? t("admin.noMatch") : t("admin.noProducts")}
                 </td>
               </tr>
@@ -1090,12 +1057,33 @@ function ProductsSection({ onAddNew }: { onAddNew: () => void }) {
                     </span>
                   )}
                 </td>
+                <td className="px-5 py-3.5 text-muted-foreground text-sm">
+                  {(p as Record<string, unknown>).buyingPrice != null
+                    ? `₮${Number((p as Record<string, unknown>).buyingPrice).toLocaleString("mn-MN")}`
+                    : "—"}
+                </td>
                 <td className="px-5 py-3.5">
                   <span
                     className={`font-medium ${p.stock === 0 ? "text-red-500" : p.stock < 10 ? "text-amber-500" : "text-emerald-600"}`}
                   >
                     {p.stock}
                   </span>
+                </td>
+                <td className="px-5 py-3.5">
+                  {(() => {
+                    const s = (p as Record<string, unknown>).status as string | undefined;
+                    if (s === "draft")
+                      return (
+                        <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 font-medium">
+                          Draft
+                        </span>
+                      );
+                    return (
+                      <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-medium">
+                        Published
+                      </span>
+                    );
+                  })()}
                 </td>
                 <td className="px-5 py-3.5 text-muted-foreground">
                   ⭐ {p.rating?.toFixed(1) ?? "—"}
@@ -1190,10 +1178,19 @@ function AdminPage() {
       {activeSection === "orders" && <OrdersSection />}
       {activeSection === "customers" && <CustomersSection />}
       {activeSection === "products" && (
-        <ProductsSection onAddNew={() => setActiveSection("add-product")} />
+        <ProductsSection
+          onAddNew={() => setActiveSection("add-product")}
+          onImport={() => setActiveSection("import-products")}
+        />
       )}
       {activeSection === "add-product" && (
         <AddProductSection onDone={() => setActiveSection("products")} />
+      )}
+      {activeSection === "import-products" && (
+        <div className="bg-card rounded-2xl border border-border p-6">
+          <h3 className="font-display text-xl mb-6">Import Products</h3>
+          <ImportProducts onDone={() => setActiveSection("products")} />
+        </div>
       )}
     </AdminLayout>
   );

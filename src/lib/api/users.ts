@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createClerkClient } from "@clerk/backend";
 import { db, ensureReady } from "../db";
 import { users, orders } from "../db/schema";
 import { eq, desc, sql } from "drizzle-orm";
-import { requireAdmin, sanitize, checkRateLimit, clientIP } from "../server-auth";
+import { requireAdmin, requireAuth, sanitize, checkRateLimit } from "../server-auth";
 
 export const checkAdminAccess = createServerFn({ method: "GET" }).handler(async () => {
   try {
@@ -32,31 +33,43 @@ export const getAllUsers = createServerFn({ method: "GET" }).handler(async () =>
   return rows;
 });
 
+// Syncs the authenticated Clerk user into the local DB. Email and clerkId
+// are always taken from Clerk — never trusted from the client.
 export const getOrCreateUser = createServerFn({ method: "POST" })
   .validator(
     z.object({
-      email: z.string().email(),
-      clerkId: z.string().optional(),
-      displayName: z.string().optional(),
+      displayName: z.string().max(200).optional(),
     }),
   )
   .handler(async ({ data }) => {
-    checkRateLimit(`getuser:${clientIP()}`, 30, 60_000);
+    const { userId } = await requireAuth();
+    checkRateLimit(`getuser:${userId}`, 10, 60_000);
     await ensureReady();
-    let [user] = await db.select().from(users).where(eq(users.email, data.email));
+
+    const clerk = createClerkClient({ secretKey: process.env.CLERK_SECRET_KEY! });
+    const clerkUser = await clerk.users.getUser(userId);
+    const email =
+      clerkUser.emailAddresses.find((e) => e.id === clerkUser.primaryEmailAddressId)
+        ?.emailAddress ?? clerkUser.emailAddresses[0]?.emailAddress;
+
+    if (!email) throw new Error("No verified email on Clerk account");
+
+    const resolvedName =
+      (data.displayName ? sanitize(data.displayName, 200) : null) ??
+      clerkUser.fullName ??
+      clerkUser.firstName ??
+      null;
+
+    let [user] = await db.select().from(users).where(eq(users.email, email));
     if (!user) {
       [user] = await db
         .insert(users)
-        .values({
-          email: data.email,
-          clerkId: data.clerkId ?? null,
-          displayName: data.displayName ?? null,
-        })
+        .values({ email, clerkId: userId, displayName: resolvedName })
         .returning();
-    } else if (data.clerkId && !user.clerkId) {
+    } else if (!user.clerkId) {
       [user] = await db
         .update(users)
-        .set({ clerkId: data.clerkId, displayName: data.displayName ?? user.displayName })
+        .set({ clerkId: userId, displayName: resolvedName ?? user.displayName })
         .where(eq(users.id, user.id))
         .returning();
     }

@@ -3,7 +3,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/contact")({
-   head: () => ({ meta: [{ title: "Contact us — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Contact us — AIT Shop" }] }),
   component: Contact,
 });
 

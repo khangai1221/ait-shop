@@ -105,7 +105,9 @@ function Home() {
             </p>
 
             <div className="mt-5 sm:mt-6">
-              <p className="text-xs sm:text-sm uppercase tracking-wider mb-2 text-white/80">{t("common.size")}</p>
+              <p className="text-xs sm:text-sm uppercase tracking-wider mb-2 text-white/80">
+                {t("common.size")}
+              </p>
               <div className="flex gap-2 flex-wrap">
                 {heroProduct.sizes.map((s: number) => (
                   <button

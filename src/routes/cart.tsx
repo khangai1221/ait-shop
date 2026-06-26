@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/language";
 import { formatPrice } from "@/lib/format-price";
 
 export const Route = createFileRoute("/cart")({
-   head: () => ({ meta: [{ title: "Cart — AIT Shop" }] }),
+  head: () => ({ meta: [{ title: "Cart — AIT Shop" }] }),
   component: CartPage,
 });
 

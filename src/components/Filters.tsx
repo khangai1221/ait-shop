@@ -70,7 +70,9 @@ export function Filters({
         />
         <div className="flex justify-between text-xs text-muted-foreground mt-2">
           <span>{formatPrice(200000)}</span>
-          <span className="font-semibold text-ink">{t("common.upTo")} {formatPrice(value.maxPrice)}</span>
+          <span className="font-semibold text-ink">
+            {t("common.upTo")} {formatPrice(value.maxPrice)}
+          </span>
         </div>
       </FilterSection>
 
@@ -141,4 +143,9 @@ function FilterSection({ title, children }: { title: string; children: React.Rea
   );
 }
 
-export const emptyFilters: FilterState = { sizes: [], colors: [], category: null, maxPrice: 700000 };
+export const emptyFilters: FilterState = {
+  sizes: [],
+  colors: [],
+  category: null,
+  maxPrice: 700000,
+};
