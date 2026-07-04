@@ -94,19 +94,19 @@ function Shop() {
         </div>
 
         <div>
-          <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
-            <p className="text-xs sm:text-sm text-muted-foreground shrink-0">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               {isLoading ? t("common.loading") : `${filtered.length} ${t("shop.products")}`}
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setMobileFilterOpen(true)}
-                className="lg:hidden inline-flex items-center gap-2 h-10 px-4 rounded-full border border-border text-sm font-medium hover:bg-muted transition active:scale-[0.97]"
+                className="lg:hidden inline-flex items-center gap-2 h-10 px-3 sm:px-4 rounded-full border border-border text-xs sm:text-sm font-medium hover:bg-muted transition active:scale-[0.97] shrink-0"
               >
-                <SlidersHorizontal className="h-4 w-4" />
+                <SlidersHorizontal className="h-4 w-4 shrink-0" />
                 {t("shop.filters")}
                 {activeCount > 0 && (
-                  <span className="h-5 w-5 rounded-full bg-brand text-brand-foreground text-[10px] font-semibold grid place-items-center">
+                  <span className="h-5 w-5 rounded-full bg-brand text-brand-foreground text-[10px] font-semibold grid place-items-center shrink-0">
                     {activeCount}
                   </span>
                 )}
@@ -114,7 +114,7 @@ function Shop() {
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value as SortKey)}
-                className="h-10 rounded-full border border-border px-3 sm:px-4 text-xs sm:text-sm bg-background focus:outline-none focus:ring-2 focus:ring-brand"
+                className="flex-1 sm:flex-none h-10 min-w-0 rounded-full border border-border px-3 sm:px-4 text-xs sm:text-sm bg-background focus:outline-none focus:ring-2 focus:ring-brand"
               >
                 {SORT_KEYS.map((key) => (
                   <option key={key} value={key}>

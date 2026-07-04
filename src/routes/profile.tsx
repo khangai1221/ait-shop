@@ -73,38 +73,38 @@ function Profile() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
-      <header className="flex items-center gap-4 mb-10">
+      <header className="flex items-center gap-3 sm:gap-4 mb-8 sm:mb-10">
         {user.imageUrl ? (
-          <img src={user.imageUrl} alt="" className="h-16 w-16 rounded-full object-cover" />
+          <img src={user.imageUrl} alt="" className="h-12 w-12 sm:h-16 sm:w-16 rounded-full object-cover shrink-0" />
         ) : (
-          <div className="h-16 w-16 rounded-full bg-gradient-to-br from-brand to-brand-deep grid place-items-center text-white font-display text-2xl">
+          <div className="h-12 w-12 sm:h-16 sm:w-16 rounded-full bg-gradient-to-br from-brand to-brand-deep grid place-items-center text-white font-display text-xl sm:text-2xl shrink-0">
             {initial}
           </div>
         )}
-        <div>
-          <h1 className="font-display text-3xl">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl sm:text-3xl truncate">
             {user.fullName ?? user.firstName ?? t("profile.myAccount")}
           </h1>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground truncate">
             {email} · {t("profile.memberSince", { year: memberYear })}
           </p>
         </div>
       </header>
 
-      <div className="grid lg:grid-cols-[240px_1fr] gap-10">
-        <nav className="space-y-1">
+      <div className="grid lg:grid-cols-[240px_1fr] gap-6 lg:gap-10">
+        <nav className="flex lg:flex-col gap-1 overflow-x-auto pb-1 lg:pb-0 scrollbar-hide">
           {TABS.map(({ id, label, Icon }) => (
             <button
               key={id}
               onClick={() => setTab(id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${tab === id ? "bg-brand/10 text-brand" : "hover:bg-muted text-muted-foreground"}`}
+              className={`shrink-0 lg:w-full flex items-center gap-2 lg:gap-3 px-3 lg:px-4 py-2.5 lg:py-3 rounded-xl text-xs sm:text-sm font-medium transition whitespace-nowrap ${tab === id ? "bg-brand/10 text-brand" : "hover:bg-muted text-muted-foreground"}`}
             >
-              <Icon className="h-4 w-4" /> {label}
+              <Icon className="h-4 w-4 shrink-0" /> {label}
             </button>
           ))}
         </nav>
 
-        <div className="rounded-2xl border border-border p-8 bg-card">
+        <div className="rounded-2xl border border-border p-4 sm:p-8 bg-card">
           {tab === "profile" && (
             <div className="space-y-5">
               <h2 className="font-display text-2xl">{t("profile.profileInfo")}</h2>

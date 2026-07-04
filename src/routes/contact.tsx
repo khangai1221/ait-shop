@@ -21,15 +21,21 @@ function Contact() {
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
       <header className="text-center mb-12">
         <p className="text-sm uppercase tracking-wider text-brand">{t("contact.title")}</p>
-        <h1 className="font-display text-5xl lg:text-6xl mt-2">{t("contact.heading")}</h1>
+        <h1 className="font-display text-3xl sm:text-4xl lg:text-6xl mt-2">
+          {t("contact.heading")}
+        </h1>
         <p className="text-muted-foreground mt-3 max-w-xl mx-auto">{t("contact.desc")}</p>
       </header>
 
       <div className="grid lg:grid-cols-3 gap-6 mb-12">
         {[
           { Icon: Mail, label: t("common.email"), val: "contact@aitshop.com" },
-          { Icon: Phone, label: t("common.phone"), val: "+1 (555) 123-4567" },
-          { Icon: MapPin, label: t("contact.flagship"), val: "120 Market St, San Francisco" },
+          { Icon: Phone, label: t("common.phone"), val: "+97694468252" },
+          {
+            Icon: MapPin,
+            label: t("contact.flagship"),
+            val: "Монгол улс, Улаанбаатар хот, Сүхбаатар дүүрэг, 9-р хороо, Их тойруу, Дархан төв, 303 тоот",
+          },
         ].map(({ Icon, label, val }) => (
           <div key={label} className="rounded-2xl border border-border p-6">
             <Icon className="h-6 w-6 text-brand" />
@@ -42,7 +48,7 @@ function Contact() {
       <div className="grid lg:grid-cols-2 gap-10">
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="rounded-3xl border border-border p-8 space-y-4 bg-card"
+          className="rounded-3xl border border-border p-5 sm:p-8 space-y-4 bg-card"
         >
           <h2 className="font-display text-2xl">{t("contact.sendMessage")}</h2>
           <div className="grid sm:grid-cols-2 gap-4">
@@ -64,13 +70,17 @@ function Contact() {
           </button>
         </form>
 
-        <div className="aspect-square lg:aspect-auto rounded-3xl bg-gradient-to-br from-[#3FBAEB] to-[#1B8FCB] relative overflow-hidden grid place-items-center">
-          <div className="text-white text-center p-8">
-            <MapPin className="h-10 w-10 mx-auto" />
-            <p className="font-display text-2xl mt-4">120 Market Street</p>
-            <p className="text-white/80 mt-1">San Francisco, CA 94103</p>
-            <p className="text-sm text-white/70 mt-4">{t("contact.hours")}</p>
-          </div>
+        <div className="aspect-square lg:aspect-auto rounded-3xl overflow-hidden border border-border">
+          <iframe
+            src={`https://maps.google.com/maps?q=${encodeURIComponent("Монгол улс, Улаанбаатар хот, Сүхбаатар дүүрэг, 9-р хороо, Их тойруу, Дархан төв, 303 тоот")}&output=embed`}
+            width="100%"
+            height="100%"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+            title="AIT Shop location — Дархан төв, Улаанбаатар"
+          />
         </div>
       </div>
 

@@ -167,7 +167,7 @@ function RootComponent() {
           {isAdmin ? (
             <Outlet />
           ) : (
-            <div className="min-h-screen flex flex-col">
+            <div className="min-h-screen flex flex-col overflow-x-clip w-full">
               <Navbar />
               <main className="flex-1">
                 <Outlet />

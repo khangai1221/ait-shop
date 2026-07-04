@@ -6,6 +6,24 @@ import { users, orders } from "../db/schema";
 import { eq, desc, sql } from "drizzle-orm";
 import { requireAdmin, requireAuth, sanitize, checkRateLimit } from "../server-auth";
 
+export const setUserAdmin = createServerFn({ method: "POST" })
+  .validator(z.object({ userId: z.number(), isAdmin: z.boolean() }))
+  .handler(async ({ data }) => {
+    const { userId: callerId } = await requireAdmin();
+    await ensureReady();
+    // Prevent self-demotion
+    const [caller] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.clerkId, callerId))
+      .limit(1);
+    if (caller?.id === data.userId && !data.isAdmin) {
+      throw new Error("You cannot remove your own admin access.");
+    }
+    await db.update(users).set({ isAdmin: data.isAdmin }).where(eq(users.id, data.userId));
+    return { success: true };
+  });
+
 export const checkAdminAccess = createServerFn({ method: "GET" }).handler(async () => {
   try {
     await requireAdmin();

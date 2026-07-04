@@ -65,7 +65,7 @@ export const createOrder = createServerFn({ method: "POST" })
       email: z.string().email().max(254),
       displayName: z.string().max(200).optional(),
       totalAmount: z.number().positive().max(1_000_000_000),
-      paymentMethod: z.enum(["qpay", "pickup"]),
+      paymentMethod: z.enum(["cash", "bank_transfer", "pickup"]),
       shippingAddress: z.string().max(500).optional(),
       items: z
         .array(

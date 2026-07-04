@@ -19,6 +19,7 @@ export type Product = {
   rating: number;
   badge?: string;
   stock: number;
+  featured?: boolean;
 };
 
 const IMAGES = [shoe1, shoe2, shoe3, shoe4, shoe5, shoe6];

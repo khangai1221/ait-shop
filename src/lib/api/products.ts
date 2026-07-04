@@ -74,6 +74,7 @@ const PUBLIC_PRODUCT_COLUMNS = {
   rating: products.rating,
   slug: products.slug,
   status: products.status,
+  featured: products.featured,
   createdAt: products.createdAt,
 } as const;
 
@@ -116,6 +117,7 @@ const productSchema = z.object({
   colors: z.array(z.string().max(20)).max(10).optional(),
   sizes: z.array(z.number()).max(20).optional(),
   rating: z.number().min(0).max(5).optional(),
+  featured: z.boolean().optional(),
 });
 
 export const createProduct = createServerFn({ method: "POST" })

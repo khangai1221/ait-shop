@@ -38,6 +38,7 @@ export const products = pgTable("products", {
   rating: doublePrecision("rating").default(4.0),
   slug: text("slug"),
   status: text("status").notNull().default("published"), // 'draft' | 'published'
+  featured: boolean("featured").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }),
 });

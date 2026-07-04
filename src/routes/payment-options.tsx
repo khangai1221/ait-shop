@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Smartphone, Store } from "lucide-react";
+import { Store, Banknote, MapPin } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { InfoPage, InfoSection } from "@/components/InfoPage";
 
@@ -11,8 +11,21 @@ export const Route = createFileRoute("/payment-options")({
 function PaymentOptions() {
   const { t } = useTranslation();
   const METHODS = [
-    { Icon: Smartphone, title: t("paymentPage.qpayTitle"), desc: t("paymentPage.qpayDesc") },
-    { Icon: Store, title: t("paymentPage.pickupTitle"), desc: t("paymentPage.pickupDesc") },
+    {
+      Icon: Banknote,
+      title: t("paymentPage.cashTitle"),
+      desc: t("paymentPage.cashDesc"),
+    },
+    {
+      Icon: Store,
+      title: t("paymentPage.bankTitle"),
+      desc: t("paymentPage.bankDesc"),
+    },
+    {
+      Icon: MapPin,
+      title: t("paymentPage.pickupTitle"),
+      desc: t("paymentPage.pickupDesc"),
+    },
   ];
   return (
     <InfoPage

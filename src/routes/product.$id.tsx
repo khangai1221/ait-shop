@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   Star,
   Heart,
@@ -11,6 +11,8 @@ import {
   Plus,
   ChevronLeft,
   ChevronRight,
+  ZoomIn,
+  X,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { getProductById, getProducts } from "@/lib/api/products";
@@ -29,6 +31,132 @@ function Spinner() {
   return (
     <div className="min-h-[60vh] grid place-items-center">
       <div className="h-8 w-8 rounded-full border-2 border-brand border-t-transparent animate-spin" />
+    </div>
+  );
+}
+
+function ZoomModal({
+  images,
+  active,
+  onClose,
+  onNext,
+  onPrev,
+}: {
+  images: string[];
+  active: number;
+  onClose: () => void;
+  onNext: () => void;
+  onPrev: () => void;
+}) {
+  const [scale, setScale] = useState(1);
+  const [origin, setOrigin] = useState({ x: 50, y: 50 });
+
+  useEffect(() => {
+    setScale(1);
+    setOrigin({ x: 50, y: 50 });
+  }, [active]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      if (e.key === "ArrowRight") onNext();
+      if (e.key === "ArrowLeft") onPrev();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose, onNext, onPrev]);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    setScale((s) => Math.min(4, Math.max(1, s + (e.deltaY < 0 ? 0.3 : -0.3))));
+  }, []);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLImageElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    setOrigin({ x, y });
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] bg-black/96 flex items-center justify-center animate-fade-in"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 h-10 w-10 rounded-full bg-white/10 text-white grid place-items-center hover:bg-white/25 transition z-10"
+        aria-label="Close zoom"
+      >
+        <X className="h-5 w-5" />
+      </button>
+
+      <div
+        className="relative flex items-center justify-center overflow-hidden"
+        style={{ width: "90vw", height: "90vh" }}
+        onWheel={handleWheel}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <img
+          src={images[active]}
+          alt="Zoomed product view"
+          onMouseMove={handleMouseMove}
+          style={{
+            transformOrigin: `${origin.x}% ${origin.y}%`,
+            transform: `scale(${scale})`,
+            cursor: scale > 1 ? "crosshair" : "zoom-in",
+            transition: scale === 1 ? "transform 0.25s ease" : "none",
+          }}
+          className="max-w-full max-h-full object-contain select-none"
+          draggable={false}
+        />
+      </div>
+
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrev();
+            }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 text-white grid place-items-center hover:bg-white/25 transition"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onNext();
+            }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 h-11 w-11 rounded-full bg-white/10 text-white grid place-items-center hover:bg-white/25 transition"
+            aria-label="Next image"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </button>
+          <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // communicate via onNext/onPrev calls indirectly — just allow dot navigation
+                  const diff = i - active;
+                  if (diff > 0) for (let j = 0; j < diff; j++) onNext();
+                  else for (let j = 0; j < -diff; j++) onPrev();
+                }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === active ? "w-5 bg-white" : "w-1.5 bg-white/30"
+                }`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+
+      <div className="absolute bottom-5 right-6 text-white/30 text-xs hidden sm:block">
+        {scale > 1 ? "Hover to aim · Scroll to zoom" : "Scroll to zoom · Esc to close"}
+      </div>
     </div>
   );
 }
@@ -53,11 +181,14 @@ function ProductPage() {
   const [color, setColor] = useState("#3B82F6");
   const [qty, setQty] = useState(1);
   const [activeImage, setActiveImage] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [zoomed, setZoomed] = useState(false);
 
   const product = useMemo(() => {
     setActiveImage(0);
     return dbProduct ? mapDbProduct(dbProduct) : null;
   }, [dbProduct]);
+
   const related = useMemo(
     () =>
       product
@@ -68,6 +199,24 @@ function ProductPage() {
         : [],
     [allDbProducts, product],
   );
+
+  const images = product?.images ?? [];
+
+  // Auto-advance: each image gets exactly 5 s; resets on manual nav or pause/resume
+  useEffect(() => {
+    if (images.length <= 1 || paused || zoomed) return;
+    const id = setTimeout(() => {
+      setActiveImage((i) => (i + 1) % images.length);
+    }, 5000);
+    return () => clearTimeout(id);
+  }, [activeImage, paused, zoomed, images.length]);
+
+  const goNext = useCallback(() => setActiveImage((i) => (i + 1) % images.length), [images.length]);
+  const goPrev = useCallback(
+    () => setActiveImage((i) => (i - 1 + images.length) % images.length),
+    [images.length],
+  );
+
   if (isLoading) return <Spinner />;
   if (!product) throw notFound();
 
@@ -107,55 +256,90 @@ function ProductPage() {
       </nav>
 
       <div className="grid lg:grid-cols-2 gap-6 sm:gap-12">
+        {/* ── IMAGE GALLERY ── */}
         <div>
-          {/* Main image with prev/next arrows */}
-          <div className="relative aspect-square rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#EBF7FD] to-[#D5EDFA] overflow-hidden">
-            <img
-              key={activeImage}
-              src={product.images[activeImage]}
-              alt={product.name}
-              className="absolute inset-0 h-full w-full object-contain p-6 sm:p-10 transition-opacity duration-200"
-            />
+          {/* Main image viewer */}
+          <div
+            className="group relative aspect-square rounded-2xl sm:rounded-3xl bg-gradient-to-br from-[#EBF7FD] to-[#D5EDFA] overflow-hidden cursor-zoom-in select-none"
+            onMouseEnter={() => setPaused(true)}
+            onMouseLeave={() => setPaused(false)}
+            onClick={() => setZoomed(true)}
+          >
+            {/* Fade between images */}
+            {images.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`${product.name} view ${i + 1}`}
+                className={`absolute inset-0 h-full w-full object-contain p-6 sm:p-10 transition-opacity duration-500 ${
+                  i === activeImage ? "opacity-100" : "opacity-0"
+                }`}
+              />
+            ))}
 
-            {product.images.length > 1 && (
+            {/* Zoom hint badge */}
+            <div className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/70 backdrop-blur grid place-items-center opacity-0 group-hover:opacity-100 transition pointer-events-none">
+              <ZoomIn className="h-4 w-4 text-ink/60" />
+            </div>
+
+            {/* Prev / Next arrows */}
+            {images.length > 1 && (
               <>
                 <button
-                  onClick={() =>
-                    setActiveImage((i) => (i - 1 + product.images.length) % product.images.length)
-                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goPrev();
+                  }}
                   aria-label="Previous image"
-                  className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/80 backdrop-blur grid place-items-center shadow-md hover:bg-white transition active:scale-95"
+                  className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/80 backdrop-blur grid place-items-center shadow-md hover:bg-white transition active:scale-95 cursor-default"
                 >
                   <ChevronLeft className="h-5 w-5 text-ink" />
                 </button>
                 <button
-                  onClick={() => setActiveImage((i) => (i + 1) % product.images.length)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goNext();
+                  }}
                   aria-label="Next image"
-                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/80 backdrop-blur grid place-items-center shadow-md hover:bg-white transition active:scale-95"
+                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 h-9 w-9 rounded-full bg-white/80 backdrop-blur grid place-items-center shadow-md hover:bg-white transition active:scale-95 cursor-default"
                 >
                   <ChevronRight className="h-5 w-5 text-ink" />
                 </button>
+              </>
+            )}
 
-                {/* Dot indicators */}
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  {product.images.map((_, i) => (
+            {/* Dot indicators + auto-advance progress bar */}
+            {images.length > 1 && (
+              <div className="absolute bottom-0 left-0 right-0">
+                <div className="flex justify-center gap-1.5 pb-3">
+                  {images.map((_, i) => (
                     <button
                       key={i}
-                      onClick={() => setActiveImage(i)}
-                      className={`h-1.5 rounded-full transition-all duration-200 ${
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setActiveImage(i);
+                      }}
+                      className={`h-1.5 rounded-full transition-all duration-300 cursor-default ${
                         i === activeImage ? "w-5 bg-brand" : "w-1.5 bg-brand/30"
                       }`}
                     />
                   ))}
                 </div>
-              </>
+                {/* Progress bar — remounts on each new image or resume to restart animation */}
+                {!paused && !zoomed && (
+                  <div
+                    key={`${activeImage}-prog`}
+                    className="h-0.5 bg-brand/50 animate-img-progress"
+                  />
+                )}
+              </div>
             )}
           </div>
 
-          {/* Thumbnail strip — product's own images */}
-          {product.images.length > 1 && (
+          {/* Thumbnail strip */}
+          {images.length > 1 && (
             <div className="mt-3 sm:mt-4 flex gap-2 sm:gap-3 overflow-x-auto pb-2 snap-x scrollbar-hide">
-              {product.images.map((img, i) => (
+              {images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImage(i)}
@@ -176,6 +360,7 @@ function ProductPage() {
           )}
         </div>
 
+        {/* ── PRODUCT DETAILS ── */}
         <div>
           <p className="text-[10px] sm:text-xs uppercase tracking-wider text-brand">
             {product.category}
@@ -212,12 +397,12 @@ function ProductPage() {
             <p className="text-xs sm:text-sm font-semibold uppercase tracking-wider mb-2">
               {t("common.size")}
             </p>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-1.5 sm:gap-2 flex-wrap">
               {product.sizes.map((s) => (
                 <button
                   key={s}
                   onClick={() => setSize(s)}
-                  className={`h-10 sm:h-11 w-10 sm:w-11 rounded-full text-xs sm:text-sm font-semibold transition active:scale-95 ${
+                  className={`h-9 w-9 sm:h-11 sm:w-11 rounded-full text-xs font-semibold transition active:scale-95 ${
                     size === s ? "bg-ink text-white" : "border border-border hover:border-brand"
                   }`}
                 >
@@ -284,11 +469,8 @@ function ProductPage() {
 
           <div className="mt-4 sm:mt-5 flex gap-3 lg:sticky lg:bottom-4">
             <button
-              onClick={() => {
-                if (!outOfStock) addToCart(product, size, color, qty);
-              }}
-              disabled={outOfStock}
-              className="flex-1 inline-flex items-center justify-center gap-2 h-12 sm:h-13 px-5 sm:px-6 py-3 sm:py-3.5 rounded-full bg-brand text-brand-foreground font-semibold hover:bg-brand-deep transition active:scale-[0.97] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => addToCart(product, size, color, qty)}
+              className="flex-1 inline-flex items-center justify-center gap-2 h-12 sm:h-14 px-5 sm:px-6 rounded-full bg-brand text-brand-foreground font-semibold hover:bg-brand-deep transition active:scale-[0.97] shadow-sm"
             >
               <ShoppingBag className="h-4 w-4" /> {t("common.addToCart")}
             </button>
@@ -302,15 +484,17 @@ function ProductPage() {
             </button>
           </div>
 
-          <div className="mt-6 sm:mt-8 grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
             {badges.map(({ Icon, label, sub }) => (
               <div
                 key={label}
-                className="rounded-xl sm:rounded-2xl border border-border p-3 sm:p-4 text-center sm:text-left"
+                className="rounded-xl sm:rounded-2xl border border-border p-3 sm:p-4 flex sm:block items-center gap-3 sm:gap-0"
               >
-                <Icon className="h-4 sm:h-5 w-4 sm:w-5 text-brand mx-auto sm:mx-0" />
-                <p className="text-xs sm:text-sm font-semibold mt-1.5 sm:mt-2">{label}</p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground">{sub}</p>
+                <Icon className="h-5 w-5 text-brand shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold sm:mt-2">{label}</p>
+                  <p className="text-xs text-muted-foreground">{sub}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -328,6 +512,17 @@ function ProductPage() {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Zoom modal */}
+      {zoomed && (
+        <ZoomModal
+          images={images}
+          active={activeImage}
+          onClose={() => setZoomed(false)}
+          onNext={goNext}
+          onPrev={goPrev}
+        />
       )}
     </div>
   );

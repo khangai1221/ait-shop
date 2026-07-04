@@ -28,6 +28,7 @@ import {
   RefreshCw,
   TrendingUp,
   TrendingDown,
+  Menu,
 } from "lucide-react";
 import {
   getAdminProducts,
@@ -46,7 +47,7 @@ import {
   exportOrdersCsv,
   deleteAllOrders,
 } from "@/lib/api/orders";
-import { getAllUsers, checkAdminAccess } from "@/lib/api/users";
+import { getAllUsers, checkAdminAccess, setUserAdmin } from "@/lib/api/users";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -110,6 +111,7 @@ function AdminLayout({
   const { t } = useTranslation();
   const { user } = useUser();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const NAV: { id: Section; label: string; Icon: React.ElementType }[] = [
     { id: "dashboard", label: t("admin.dashboard"), Icon: LayoutDashboard },
@@ -121,10 +123,29 @@ function AdminLayout({
     { id: "import-products", label: "Import Products", Icon: FileUp },
   ];
 
+  const selectSection = (id: Section) => {
+    setActiveSection(id);
+    setMobileOpen(false);
+  };
+
   return (
-    <div className="flex min-h-screen bg-muted/30">
+    <div className="flex min-h-screen bg-muted/30 overflow-hidden">
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden animate-fade-in"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — fixed overlay on mobile, static column on desktop */}
       <aside
-        className={`bg-[#1A2B4C] text-white flex flex-col transition-all duration-300 shrink-0 ${collapsed ? "w-[72px]" : "w-[240px]"}`}
+        className={`
+          fixed inset-y-0 left-0 z-50 bg-[#1A2B4C] text-white flex flex-col transition-all duration-300
+          lg:relative lg:translate-x-0 lg:shrink-0
+          ${mobileOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"}
+          ${collapsed ? "lg:w-[72px]" : "w-[240px]"}
+        `}
       >
         <div className="flex items-center gap-3 px-4 h-16 border-b border-white/10">
           <span className="shrink-0 h-8 w-8 rounded-lg bg-brand inline-flex items-center justify-center font-black text-white text-base select-none">
@@ -135,10 +156,19 @@ function AdminLayout({
               AIT <span className="text-brand">SHOP</span>
             </span>
           )}
+          {/* Close on mobile */}
+          <button
+            onClick={() => setMobileOpen(false)}
+            className="ml-auto p-1 rounded hover:bg-white/10 lg:hidden"
+            aria-label="Close menu"
+          >
+            <X className="h-4 w-4" />
+          </button>
+          {/* Collapse on desktop */}
           {!collapsed && (
             <button
               onClick={() => setCollapsed(true)}
-              className="ml-auto p-1 rounded hover:bg-white/10"
+              className="ml-auto p-1 rounded hover:bg-white/10 hidden lg:block"
             >
               <X className="h-3.5 w-3.5" />
             </button>
@@ -146,7 +176,7 @@ function AdminLayout({
           {collapsed && (
             <button
               onClick={() => setCollapsed(false)}
-              className="p-1 rounded hover:bg-white/10 ml-auto"
+              className="p-1 rounded hover:bg-white/10 ml-auto hidden lg:block"
             >
               <ChevronDown className="h-3 w-3 -rotate-90" />
             </button>
@@ -163,8 +193,8 @@ function AdminLayout({
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveSection(item.id)}
-                className={`w-full flex items-center gap-3 px-5 py-2.5 text-sm transition ${active ? "bg-brand text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                onClick={() => selectSection(item.id)}
+                className={`w-full flex items-center gap-3 px-5 py-3 text-sm transition ${active ? "bg-brand text-white" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
               >
                 <item.Icon className="h-4 w-4 shrink-0" />
                 {!collapsed && <span className="truncate">{item.label}</span>}
@@ -190,15 +220,27 @@ function AdminLayout({
           </div>
         </div>
       </aside>
+
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <header className="h-16 bg-background border-b border-border flex items-center gap-4 px-6 shrink-0">
-          <h1 className="font-display text-xl capitalize">{activeSection.replace("-", " ")}</h1>
-          <div className="ml-auto flex items-center gap-3">
-            <div className="relative hidden sm:block">
+        <header className="h-16 bg-background border-b border-border flex items-center gap-3 px-4 sm:px-6 shrink-0">
+          {/* Hamburger on mobile */}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="lg:hidden p-2 rounded-lg hover:bg-muted transition"
+            aria-label="Open menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+          <h1 className="font-display text-base sm:text-xl capitalize truncate">
+            {activeSection.replace("-", " ")}
+          </h1>
+          <div className="ml-auto flex items-center gap-2 sm:gap-3">
+            <div className="relative hidden md:block">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <input
                 placeholder={t("admin.searchPlaceholder")}
-                className="w-64 h-10 pl-9 pr-4 rounded-full bg-muted/60 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-brand"
+                className="w-48 lg:w-64 h-10 pl-9 pr-4 rounded-full bg-muted/60 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-brand"
               />
             </div>
             <button className="relative p-2 rounded-full hover:bg-muted">
@@ -210,7 +252,7 @@ function AdminLayout({
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-auto p-6">{children}</main>
+        <main className="flex-1 overflow-auto p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );
@@ -709,10 +751,26 @@ function OrdersSection() {
 
 function CustomersSection() {
   const { t } = useTranslation();
+  const qc = useQueryClient();
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ["admin-customers"],
     queryFn: () => getAllUsers(),
   });
+  const [toggling, setToggling] = useState<number | null>(null);
+
+  const handleToggleAdmin = async (userId: number, currentlyAdmin: boolean) => {
+    setToggling(userId);
+    try {
+      await setUserAdmin({ data: { userId, isAdmin: !currentlyAdmin } });
+      qc.invalidateQueries({ queryKey: ["admin-customers"] });
+      toast.success(currentlyAdmin ? "Admin access removed." : "Admin access granted.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to update role.");
+    } finally {
+      setToggling(null);
+    }
+  };
+
   return (
     <div className="bg-card rounded-2xl border border-border overflow-hidden">
       <div className="p-5">
@@ -731,19 +789,20 @@ function CustomersSection() {
               <th className="px-5 py-3 text-left font-medium">{t("common.orders")}</th>
               <th className="px-5 py-3 text-right font-medium">{t("common.spent")}</th>
               <th className="px-5 py-3 text-left font-medium">{t("common.role")}</th>
+              <th className="px-5 py-3 text-left font-medium">Access</th>
             </tr>
           </thead>
           <tbody>
             {isLoading && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
                   {t("common.loading")}
                 </td>
               </tr>
             )}
             {!isLoading && customers.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-muted-foreground">
+                <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
                   {t("admin.noCustomers")}
                 </td>
               </tr>
@@ -773,6 +832,19 @@ function CustomersSection() {
                     {c.isAdmin ? t("common.admin") : t("common.customers")}
                   </span>
                 </td>
+                <td className="px-5 py-3.5">
+                  <button
+                    onClick={() => handleToggleAdmin(c.id, !!c.isAdmin)}
+                    disabled={toggling === c.id}
+                    className={`text-xs h-7 px-3 rounded-full font-medium border transition disabled:opacity-50 ${
+                      c.isAdmin
+                        ? "border-red-200 text-red-600 hover:bg-red-50"
+                        : "border-brand/30 text-brand hover:bg-brand/5"
+                    }`}
+                  >
+                    {toggling === c.id ? "…" : c.isAdmin ? "Remove admin" : "Make admin"}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -794,6 +866,7 @@ type ProductFormData = {
   colors: string;
   sizes: string;
   rating: string;
+  featured: boolean;
 };
 
 const EMPTY_FORM: ProductFormData = {
@@ -808,6 +881,7 @@ const EMPTY_FORM: ProductFormData = {
   colors: "#3B82F6, #111827, #FFFFFF",
   sizes: "38, 39, 40, 41, 42, 43, 44, 45",
   rating: "4.5",
+  featured: true,
 };
 
 function parseFormToData(form: ProductFormData) {
@@ -829,6 +903,7 @@ function parseFormToData(form: ProductFormData) {
       .map((s) => parseFloat(s.trim()))
       .filter((n) => !isNaN(n)),
     rating: parseFloat(form.rating) || 4.0,
+    featured: form.featured,
   };
 }
 
@@ -858,6 +933,7 @@ function productToForm(p: Record<string, unknown>): ProductFormData {
     colors: p.colors ? (JSON.parse(p.colors as string) as string[]).join(", ") : "",
     sizes: p.sizes ? (JSON.parse(p.sizes as string) as number[]).join(", ") : "",
     rating: String(p.rating ?? "4.5"),
+    featured: p.featured !== false && p.featured !== 0,
   };
 }
 
@@ -908,8 +984,7 @@ function ProductForm({
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setForm((f) => ({ ...f, [key]: e.target.value }));
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
+  const uploadFiles = async (files: File[]) => {
     if (!files.length) return;
     setUploading(true);
     try {
@@ -917,7 +992,11 @@ function ProductForm({
         files.map(async (file) => {
           const fileBase64 = await fileToBase64(file);
           const { url } = await uploadProductImage({
-            data: { fileName: file.name, fileBase64, contentType: file.type },
+            data: {
+              fileName: file.name || `paste-${Date.now()}.png`,
+              fileBase64,
+              contentType: file.type,
+            },
           });
           return url;
         }),
@@ -928,9 +1007,28 @@ function ProductForm({
       toast.error(t("admin.imageUploadFailed"));
     } finally {
       setUploading(false);
-      e.target.value = "";
     }
   };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    await uploadFiles(files);
+    e.target.value = "";
+  };
+
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      const items = Array.from(e.clipboardData?.items ?? []);
+      const imageFiles = items
+        .filter((item) => item.type.startsWith("image/"))
+        .map((item) => item.getAsFile())
+        .filter((f): f is File => f !== null);
+      if (imageFiles.length) uploadFiles(imageFiles);
+    };
+    window.addEventListener("paste", handlePaste);
+    return () => window.removeEventListener("paste", handlePaste);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const removeImage = (index: number) =>
     setForm((f) => ({ ...f, imageUrls: f.imageUrls.filter((_, i) => i !== index) }));
@@ -1020,6 +1118,30 @@ function ProductForm({
         </FormField>
       </div>
 
+      {/* Featured toggle */}
+      <label className="flex items-center gap-3 cursor-pointer select-none py-1">
+        <div className="relative">
+          <input
+            type="checkbox"
+            className="sr-only"
+            checked={form.featured}
+            onChange={(e) => setForm((f) => ({ ...f, featured: e.target.checked }))}
+          />
+          <div
+            className={`w-11 h-6 rounded-full transition-colors ${form.featured ? "bg-brand" : "bg-border"}`}
+          />
+          <div
+            className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${form.featured ? "translate-x-5" : "translate-x-0"}`}
+          />
+        </div>
+        <span className="text-sm font-medium">
+          Show on homepage{" "}
+          <span className="text-muted-foreground font-normal">
+            (only products with clean, no-background images)
+          </span>
+        </span>
+      </label>
+
       {/* Multi-image upload */}
       <FormField label={`${t("admin.images")} *`}>
         <div className="space-y-3">
@@ -1061,7 +1183,7 @@ function ProductForm({
               ))}
             </div>
           )}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <label
               className={`cursor-pointer inline-flex items-center gap-2 h-9 px-4 rounded-full border border-border text-sm transition ${
                 uploading ? "opacity-50 pointer-events-none" : "hover:bg-muted"
@@ -1078,6 +1200,13 @@ function ProductForm({
                 disabled={uploading}
               />
             </label>
+            <span className="text-xs text-muted-foreground">
+              or{" "}
+              <kbd className="px-1.5 py-0.5 rounded bg-muted border border-border font-mono text-[11px]">
+                Ctrl+V
+              </kbd>{" "}
+              to paste
+            </span>
             {form.imageUrls.length === 0 && (
               <span className="text-xs text-red-500 font-medium">{t("admin.noImages")}</span>
             )}

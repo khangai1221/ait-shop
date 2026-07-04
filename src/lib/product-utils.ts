@@ -24,6 +24,7 @@ export type DbProduct = {
   rating: number | null;
   slug?: string | null;
   status?: string | null;
+  featured?: boolean | null;
   createdAt: Date | string;
   updatedAt?: Date | string | null;
 };
@@ -68,5 +69,6 @@ export function mapDbProduct(p: DbProduct): Product {
     rating: p.rating ?? 4.0,
     badge: p.badge ?? undefined,
     stock: p.stock,
+    featured: p.featured ?? true,
   };
 }

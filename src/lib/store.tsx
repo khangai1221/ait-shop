@@ -12,8 +12,8 @@ type StoreCtx = {
   cart: CartItem[];
   wishlist: string[];
   addToCart: (p: Product, size?: number, color?: string, qty?: number) => void;
-  removeFromCart: (id: string) => void;
-  updateQty: (id: string, qty: number) => void;
+  removeFromCart: (id: string, size: number, color: string) => void;
+  updateQty: (id: string, qty: number, size: number, color: string) => void;
   toggleWishlist: (id: string) => void;
   cartCount: number;
   cartTotal: number;
@@ -37,12 +37,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const removeFromCart = useCallback(
-    (id: string) => setCart((c) => c.filter((i) => i.product.id !== id)),
+    (id: string, size: number, color: string) =>
+      setCart((c) => c.filter((i) => !(i.product.id === id && i.size === size && i.color === color))),
     [],
   );
   const updateQty = useCallback(
-    (id: string, qty: number) =>
-      setCart((c) => c.map((i) => (i.product.id === id ? { ...i, quantity: Math.max(1, qty) } : i))),
+    (id: string, qty: number, size: number, color: string) =>
+      setCart((c) =>
+        c.map((i) =>
+          i.product.id === id && i.size === size && i.color === color
+            ? { ...i, quantity: Math.max(1, qty) }
+            : i,
+        ),
+      ),
     [],
   );
   const toggleWishlist = useCallback(

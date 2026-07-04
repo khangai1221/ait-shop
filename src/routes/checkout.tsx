@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useRef } from "react";
-import { MapPin, ChevronLeft, CheckCircle2, Lock } from "lucide-react";
+import { MapPin, Phone, Mail, ChevronLeft, CheckCircle2, Lock } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { useUser } from "@clerk/clerk-react";
 import { createOrder } from "@/lib/api/orders";
@@ -89,7 +89,8 @@ function Checkout() {
           displayName: `${firstName} ${lastName}`.trim() || user?.fullName || undefined,
           totalAmount: total,
           paymentMethod: "pickup",
-          shippingAddress: "Meet & pay — Dulguun Nuur, Ulaanbaatar",
+          shippingAddress:
+            "Meet & pay — Монгол улс, Улаанбаатар хот, Сүхбаатар дүүрэг, 9-р хороо, Их тойруу, Дархан төв, 303 тоот",
           items: cart.map((item) => ({
             productId: null,
             productName: item.product.name,
@@ -129,13 +130,13 @@ function Checkout() {
       <div className="flex items-center gap-3 mb-6 sm:mb-10">
         <Link
           to="/cart"
-          className="sm:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-border hover:bg-muted transition text-xs font-medium"
+          className="sm:hidden inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-border hover:bg-muted transition text-xs font-medium shrink-0"
         >
           <ChevronLeft className="h-3.5 w-3.5" />
           {t("common.cart")}
         </Link>
-        <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl">{t("checkout.title")}</h1>
-        <div className="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
+        <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl min-w-0">{t("checkout.title")}</h1>
+        <div className="ml-auto hidden sm:flex items-center gap-1 text-xs text-muted-foreground shrink-0">
           <Lock className="h-3.5 w-3.5" /> {t("checkout.secureCheckout")}
         </div>
       </div>
@@ -164,21 +165,21 @@ function Checkout() {
               name="phone"
               type="tel"
               required
-              placeholder="99001234"
+              placeholder="+97694468252"
             />
           </Section>
 
-          {/* Meet & Pay */}
-          <Section title="Payment">
+          {/* Payment */}
+          <Section title={t("checkout.payment")}>
             <div className="rounded-2xl border border-brand bg-brand/5 p-4 flex items-start gap-3">
               <div className="h-9 w-9 rounded-xl bg-brand text-brand-foreground grid place-items-center shrink-0">
                 <MapPin className="h-4 w-4" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Meet &amp; Pay in Person</p>
+                <p className="font-semibold text-sm">Pay at Our Store</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Place your order, then come to our location to pay and collect your shoes.
-                  No online payment required.
+                  Place your order online, then visit our store to pay and collect your shoes. No
+                  online payment required.
                 </p>
               </div>
             </div>
@@ -186,25 +187,39 @@ function Checkout() {
             {/* Store location map */}
             <div className="rounded-2xl overflow-hidden border border-border">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1336.6885251126505!2d106.91233832329132!3d47.929089894891355!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5d969266f8fbb9f5%3A0xb0ce5e4d0d385fd2!2sDulguun%20Nuur!5e0!3m2!1sen!2smn!4v1782482295466!5m2!1sen!2smn"
+                src={`https://maps.google.com/maps?q=${encodeURIComponent("Монгол улс, Улаанбаатар хот, Сүхбаатар дүүрэг, 9-р хороо, Их тойруу, Дархан төв, 303 тоот")}&output=embed`}
                 width="100%"
                 height="280"
                 style={{ border: 0, display: "block" }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="strict-origin-when-cross-origin"
-                title="AIT Shop location — Dulguun Nuur, Ulaanbaatar"
+                title="AIT Shop location — Дархан төв, Улаанбаатар"
               />
             </div>
 
-            <div className="flex items-start gap-3 text-sm">
-              <MapPin className="h-4 w-4 text-brand shrink-0 mt-0.5" />
-              <div>
-                <p className="font-medium">Dulguun Nuur, Ulaanbaatar</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  We will contact you to confirm a pickup time after you place your order.
+            <div className="space-y-2.5 text-sm">
+              <div className="flex items-start gap-3">
+                <MapPin className="h-4 w-4 text-brand shrink-0 mt-0.5" />
+                <p>
+                  Монгол улс, Улаанбаатар хот, Сүхбаатар дүүрэг, 9-р хороо, Их тойруу, Дархан төв,
+                  303 тоот
                 </p>
               </div>
+              <a
+                href="tel:+97694468252"
+                className="flex items-center gap-3 text-muted-foreground hover:text-brand transition"
+              >
+                <Phone className="h-4 w-4 text-brand shrink-0" />
+                +976 9446 8252
+              </a>
+              <a
+                href="mailto:contact@aitshop.com"
+                className="flex items-center gap-3 text-muted-foreground hover:text-brand transition"
+              >
+                <Mail className="h-4 w-4 text-brand shrink-0" />
+                contact@aitshop.com
+              </a>
             </div>
           </Section>
         </div>

@@ -76,6 +76,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    overflow-x: clip;
   }
   h1,
   h2,
@@ -221,6 +222,19 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Product image gallery progress bar */
+@keyframes img-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+.animate-img-progress {
+  animation: img-progress 5s linear forwards;
 }
 
 /* Product card touch reveal (no hover on mobile) */

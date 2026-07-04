@@ -47,7 +47,7 @@ function Wishlist() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
-      <h1 className="font-display text-4xl lg:text-5xl mb-10">
+      <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl mb-8 sm:mb-10">
         {t("common.wishlist")} ({items.length})
       </h1>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -64,17 +64,17 @@ function Wishlist() {
                 className="h-full w-full object-contain p-4 group-hover:scale-110 transition"
               />
             </Link>
-            <div className="mt-4 flex justify-between items-start">
-              <div>
-                <p className="text-xs uppercase tracking-wider text-muted-foreground">
+            <div className="mt-4 flex justify-between items-start gap-2">
+              <div className="min-w-0">
+                <p className="text-xs uppercase tracking-wider text-muted-foreground truncate">
                   {p.category}
                 </p>
-                <h3 className="font-semibold mt-1">{p.name}</h3>
+                <h3 className="font-semibold mt-1 truncate">{p.name}</h3>
                 <p className="font-display text-lg mt-1">{formatPrice(p.price, language)}</p>
               </div>
               <button
                 onClick={() => toggleWishlist(p.id)}
-                className="p-2 text-muted-foreground hover:text-destructive"
+                className="p-2 text-muted-foreground hover:text-destructive shrink-0"
               >
                 <Trash2 className="h-4 w-4" />
               </button>

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Minus, Plus, Trash2, ShoppingBag, ChevronLeft } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, ChevronLeft, MapPin, Phone, Mail } from "lucide-react";
 import { useState } from "react";
 import { useStore } from "@/lib/store";
 import { useTranslation } from "react-i18next";
@@ -91,7 +91,9 @@ function CartPage() {
                 <div className="mt-3 sm:mt-4 flex items-center justify-between">
                   <div className="inline-flex items-center border border-border rounded-full">
                     <button
-                      onClick={() => updateQty(item.product.id, item.quantity - 1)}
+                      onClick={() =>
+                        updateQty(item.product.id, item.quantity - 1, item.size, item.color)
+                      }
                       className="h-8 sm:h-9 w-8 sm:w-9 grid place-items-center active:scale-90 hover:bg-muted rounded-full transition"
                     >
                       <Minus className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
@@ -100,14 +102,16 @@ function CartPage() {
                       {item.quantity}
                     </span>
                     <button
-                      onClick={() => updateQty(item.product.id, item.quantity + 1)}
+                      onClick={() =>
+                        updateQty(item.product.id, item.quantity + 1, item.size, item.color)
+                      }
                       className="h-8 sm:h-9 w-8 sm:w-9 grid place-items-center active:scale-90 hover:bg-muted rounded-full transition"
                     >
                       <Plus className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
                     </button>
                   </div>
                   <button
-                    onClick={() => removeFromCart(item.product.id)}
+                    onClick={() => removeFromCart(item.product.id, item.size, item.color)}
                     className="text-muted-foreground hover:text-destructive p-1.5 sm:p-2 active:scale-90 transition"
                   >
                     <Trash2 className="h-3.5 sm:h-4 w-3.5 sm:w-4" />
@@ -162,9 +166,9 @@ function CartPage() {
 
           <Link
             to="/checkout"
-            className="mt-4 sm:mt-6 block text-center h-11 sm:h-12 leading-[2.75rem] sm:leading-[3rem] rounded-full bg-brand text-brand-foreground font-semibold hover:bg-brand-deep transition active:scale-[0.98]"
+            className="mt-4 sm:mt-6 block text-center h-12 leading-[3rem] rounded-full bg-brand text-brand-foreground font-semibold hover:bg-brand-deep transition active:scale-[0.98]"
           >
-            {t("cart.checkout")}
+            {t("cart.checkout")} →
           </Link>
           <Link
             to="/shop"
@@ -172,6 +176,34 @@ function CartPage() {
           >
             {t("cart.continueShopping")}
           </Link>
+
+          {/* Store info */}
+          <div className="mt-5 pt-5 border-t border-border space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Pick-up &amp; Pay in Person
+            </p>
+            <div className="flex gap-2 text-xs text-muted-foreground">
+              <MapPin className="h-3.5 w-3.5 text-brand shrink-0 mt-0.5" />
+              <span>
+                Монгол улс, Улаанбаатар хот, Сүхбаатар дүүрэг, 9-р хороо, Их тойруу, Дархан төв, 303
+                тоот
+              </span>
+            </div>
+            <a
+              href="tel:+97694468252"
+              className="flex gap-2 text-xs text-muted-foreground hover:text-brand transition"
+            >
+              <Phone className="h-3.5 w-3.5 text-brand shrink-0" />
+              +976 9446 8252
+            </a>
+            <a
+              href="mailto:contact@aitshop.com"
+              className="flex gap-2 text-xs text-muted-foreground hover:text-brand transition"
+            >
+              <Mail className="h-3.5 w-3.5 text-brand shrink-0" />
+              contact@aitshop.com
+            </a>
+          </div>
         </aside>
       </div>
     </div>

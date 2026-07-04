@@ -15,7 +15,7 @@ export function InfoPage({
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
       <header className="text-center mb-10">
         <p className="text-sm uppercase tracking-wider text-brand">{tag}</p>
-        <h1 className="font-display text-4xl sm:text-5xl mt-2">{title}</h1>
+        <h1 className="font-display text-2xl sm:text-4xl lg:text-5xl mt-2">{title}</h1>
         {description && (
           <p className="text-muted-foreground mt-3 max-w-xl mx-auto leading-relaxed">
             {description}
