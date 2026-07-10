@@ -265,7 +265,7 @@ export const exportAnalyticsCsv = createServerFn({ method: "GET" }).handler(asyn
   await requireAdmin();
   await ensureReady();
 
-  const stats = await getSalesStats.handler();
+  const stats = await getSalesStats();
 
   const esc = (v: string | null | undefined) => `"${(v ?? "").replace(/"/g, '""')}"`;
   const lines: string[] = [];
