@@ -44,7 +44,7 @@ import {
   getAllOrders,
   updateOrderStatus,
   getSalesStats,
-  exportOrdersCsv,
+  exportAnalyticsCsv,
   deleteAllOrders,
 } from "@/lib/api/orders";
 import { getAllUsers, checkAdminAccess, setUserAdmin } from "@/lib/api/users";
@@ -428,12 +428,12 @@ function AnalyticsSection() {
   };
 
   const handleExport = async () => {
-    const csv = await exportOrdersCsv();
+    const csv = await exportAnalyticsCsv();
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `ait-shop-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `ait-shop-analytics-${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };

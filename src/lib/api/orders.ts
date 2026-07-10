@@ -250,7 +250,7 @@ export const exportOrdersCsv = createServerFn({ method: "GET" }).handler(async (
       r.id,
       esc(r.userName),
       esc(r.userEmail),
-      new Date(r.orderDate).toISOString(),
+      new Date(r.orderDate).toISOString().slice(0, 10),
       r.totalAmount,
       r.status,
       r.paymentMethod ?? "",
@@ -259,6 +259,50 @@ export const exportOrdersCsv = createServerFn({ method: "GET" }).handler(async (
   );
 
   return [header, ...lines].join("\n");
+});
+
+export const exportAnalyticsCsv = createServerFn({ method: "GET" }).handler(async () => {
+  await requireAdmin();
+  await ensureReady();
+
+  const stats = await getSalesStats.handler();
+
+  const esc = (v: string | null | undefined) => `"${(v ?? "").replace(/"/g, '""')}"`;
+  const lines: string[] = [];
+
+  lines.push("SALES ANALYTICS EXPORT");
+  lines.push(`Generated,${new Date().toISOString().slice(0, 10)}`);
+  lines.push("");
+
+  lines.push("PERIOD SUMMARY");
+  lines.push("Period,Revenue (₮),Orders");
+  const periods = [
+    ["Today", stats.today],
+    ["This Week", stats.thisWeek],
+    ["Last Week", stats.lastWeek],
+    ["This Month", stats.thisMonth],
+    ["Last Month", stats.lastMonth],
+    ["All Time", stats.allTime],
+  ] as const;
+  for (const [label, data] of periods) {
+    lines.push(`${label},${data.revenue},${data.orders}`);
+  }
+  lines.push("");
+
+  lines.push("DAILY REVENUE (Last 30 Days)");
+  lines.push("Date,Revenue (₮),Orders");
+  for (const d of stats.dailyRevenue) {
+    lines.push(`${d.date},${d.revenue},${d.orderCount}`);
+  }
+  lines.push("");
+
+  lines.push("TOP PRODUCTS");
+  lines.push("Product,Revenue (₮),Quantity Sold");
+  for (const p of stats.topProducts) {
+    lines.push(`${esc(p.name)},${p.revenue},${p.quantity}`);
+  }
+
+  return lines.join("\n");
 });
 
 export const deleteAllOrders = createServerFn({ method: "POST" }).handler(async () => {

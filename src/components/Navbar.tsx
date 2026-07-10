@@ -11,6 +11,7 @@ export function Navbar() {
   const { language, setLanguage } = useLanguage();
   const { cartCount, wishlist } = useStore();
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [q, setQ] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -69,7 +70,13 @@ export function Navbar() {
     }
   };
 
-  const close = () => setOpen(false);
+  const close = () => {
+    setClosing(true);
+    setTimeout(() => {
+      setClosing(false);
+      setOpen(false);
+    }, 280);
+  };
 
   return (
     <header className="sticky top-0 z-40 w-full bg-background/90 backdrop-blur-lg border-b border-border/60">
@@ -179,12 +186,15 @@ export function Navbar() {
       </div>
 
       {/* Mobile slide-in menu */}
-      {open && (
+      {(open || closing) && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="fixed inset-0 bg-black/40 animate-fade-in" onClick={close} />
+          <div
+            className={`fixed inset-0 bg-black/40 ${closing ? "animate-fade-out" : "animate-fade-in"}`}
+            onClick={close}
+          />
           <div
             ref={menuRef}
-            className="fixed top-16 right-0 bottom-0 w-72 max-w-[85vw] bg-background border-l border-border animate-slide-up shadow-2xl flex flex-col"
+            className={`fixed top-16 right-0 bottom-0 w-72 max-w-[85vw] bg-background border-l border-border shadow-2xl flex flex-col ${closing ? "animate-slide-out-right" : "animate-slide-in-right"}`}
           >
             <div className="flex-1 overflow-y-auto p-4 space-y-1">
               {links.map((l) => (
