@@ -2272,11 +2272,11 @@ export {
   parseError as q,
   retry$1 as r,
   eventMethodCalled as s,
-  createContextAndHook as t,
+  buildErrorThrower as t,
   useAssertWrappedByClerkProvider as u,
-  useClerkInstanceContext as v,
-  createCheckAuthorization as w,
-  resolveAuthState as x,
-  buildErrorThrower as y,
+  createContextAndHook as v,
+  useClerkInstanceContext as w,
+  createCheckAuthorization as x,
+  resolveAuthState as y,
   ClerkInstanceContext as z
 };

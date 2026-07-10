@@ -35,6 +35,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductIdRouteImport } from './routes/product.$id'
+import { Route as LoginSplatRouteImport } from './routes/login.$'
 import { Route as CategorySlugRouteImport } from './routes/category.$slug'
 
 const WishlistRoute = WishlistRouteImport.update({
@@ -167,6 +168,11 @@ const ProductIdRoute = ProductIdRouteImport.update({
   path: '/product/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginSplatRoute = LoginSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => LoginRoute,
+} as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
   id: '/category/$slug',
   path: '/category/$slug',
@@ -185,7 +191,7 @@ export interface FileRoutesByFullPath {
   '/feedback': typeof FeedbackRoute
   '/find-store': typeof FindStoreRoute
   '/investors': typeof InvestorsRoute
-  '/login': typeof LoginRoute
+  '/login': typeof LoginRouteWithChildren
   '/new-arrivals': typeof NewArrivalsRoute
   '/news': typeof NewsRoute
   '/newsletter': typeof NewsletterRoute
@@ -200,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/sustainability': typeof SustainabilityRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/login/$': typeof LoginSplatRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesByTo {
@@ -214,7 +221,7 @@ export interface FileRoutesByTo {
   '/feedback': typeof FeedbackRoute
   '/find-store': typeof FindStoreRoute
   '/investors': typeof InvestorsRoute
-  '/login': typeof LoginRoute
+  '/login': typeof LoginRouteWithChildren
   '/new-arrivals': typeof NewArrivalsRoute
   '/news': typeof NewsRoute
   '/newsletter': typeof NewsletterRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/sustainability': typeof SustainabilityRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/login/$': typeof LoginSplatRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRoutesById {
@@ -244,7 +252,7 @@ export interface FileRoutesById {
   '/feedback': typeof FeedbackRoute
   '/find-store': typeof FindStoreRoute
   '/investors': typeof InvestorsRoute
-  '/login': typeof LoginRoute
+  '/login': typeof LoginRouteWithChildren
   '/new-arrivals': typeof NewArrivalsRoute
   '/news': typeof NewsRoute
   '/newsletter': typeof NewsletterRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/sustainability': typeof SustainabilityRoute
   '/wishlist': typeof WishlistRoute
   '/category/$slug': typeof CategorySlugRoute
+  '/login/$': typeof LoginSplatRoute
   '/product/$id': typeof ProductIdRoute
 }
 export interface FileRouteTypes {
@@ -290,6 +299,7 @@ export interface FileRouteTypes {
     | '/sustainability'
     | '/wishlist'
     | '/category/$slug'
+    | '/login/$'
     | '/product/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/sustainability'
     | '/wishlist'
     | '/category/$slug'
+    | '/login/$'
     | '/product/$id'
   id:
     | '__root__'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/sustainability'
     | '/wishlist'
     | '/category/$slug'
+    | '/login/$'
     | '/product/$id'
   fileRoutesById: FileRoutesById
 }
@@ -363,7 +375,7 @@ export interface RootRouteChildren {
   FeedbackRoute: typeof FeedbackRoute
   FindStoreRoute: typeof FindStoreRoute
   InvestorsRoute: typeof InvestorsRoute
-  LoginRoute: typeof LoginRoute
+  LoginRoute: typeof LoginRouteWithChildren
   NewArrivalsRoute: typeof NewArrivalsRoute
   NewsRoute: typeof NewsRoute
   NewsletterRoute: typeof NewsletterRoute
@@ -565,6 +577,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login/$': {
+      id: '/login/$'
+      path: '/$'
+      fullPath: '/login/$'
+      preLoaderRoute: typeof LoginSplatRouteImport
+      parentRoute: typeof LoginRoute
+    }
     '/category/$slug': {
       id: '/category/$slug'
       path: '/category/$slug'
@@ -574,6 +593,16 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface LoginRouteChildren {
+  LoginSplatRoute: typeof LoginSplatRoute
+}
+
+const LoginRouteChildren: LoginRouteChildren = {
+  LoginSplatRoute: LoginSplatRoute,
+}
+
+const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -587,7 +616,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedbackRoute: FeedbackRoute,
   FindStoreRoute: FindStoreRoute,
   InvestorsRoute: InvestorsRoute,
-  LoginRoute: LoginRoute,
+  LoginRoute: LoginRouteWithChildren,
   NewArrivalsRoute: NewArrivalsRoute,
   NewsRoute: NewsRoute,
   NewsletterRoute: NewsletterRoute,

@@ -17,6 +17,7 @@ import { StoreProvider } from "../lib/store";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
 import { SafeClerkProvider } from "@/lib/auth.tsx";
+import { UserSync } from "@/components/UserSync";
 import { I18nProvider } from "@/lib/i18n-provider";
 import { LanguageProvider } from "@/lib/language";
 
@@ -162,6 +163,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeClerkProvider>
+        <UserSync />
         <StoreProvider>
           <Toaster richColors position="top-right" />
           {isAdmin ? (
